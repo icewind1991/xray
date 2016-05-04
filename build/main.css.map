@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///webpack:///css/app.less"],"names":[],"mappings":"AAAA,2BAAU,iBAAiB","file":"main.css","sourcesContent":["h1.header{text-align:center}\n\n\n/** WEBPACK FOOTER **\n ** webpack:///css/app.less\n **/"],"sourceRoot":""}
