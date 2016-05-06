@@ -20,15 +20,27 @@ export default class DataProvider {
 			}
 		});
 
+		let lastRequest = '';
+		let requestCounter = 0;
 		source.addEventListener('lock', (e) => {
 			const lock = JSON.parse(e.data);
 			if (this.listening) {
+				if (lock.request !== lastRequest) {
+					requestCounter = 1 - requestCounter;
+					lastRequest = lock.request;
+				}
+				lock.requestCounter = requestCounter;
 				lockCb(lock);
 			}
 		});
 		source.addEventListener('storage', (e) => {
 			const lock = JSON.parse(e.data);
 			if (this.listening) {
+				if (lock.request !== lastRequest) {
+					requestCounter = 1 - requestCounter;
+					lastRequest = lock.request;
+				}
+				lock.requestCounter = requestCounter;
 				storageCb(lock);
 			}
 		});

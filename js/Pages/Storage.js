@@ -21,8 +21,9 @@ class StorageRow extends Component {
 		if (this.state.showState) {
 			trace = (<StackTrace trace={entry.stack}/>);
 		}
+		const className = 'req-' + entry.requestCounter;
 		return (
-			<tr key={key}
+			<tr key={key} className={style[className]}
 				onClick={onClick}>
 				<td className={style.time}><Timestamp
 					value={entry.time * 1000}
@@ -42,6 +43,8 @@ class StorageRow extends Component {
 }
 
 export default class Storage extends Component {
+	filteredRows = [];
+
 	renderRow = (index, key) => {
 		return (
 			<StorageRow rowKey={key}

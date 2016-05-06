@@ -75,10 +75,12 @@ export class App extends Component {
 		let page;
 		switch (this.state.page) {
 			case 'lock':
-				page = <Lock filter={this.state.filter} locks={this.state.locks}/>;
+				page =
+					<Lock filter={this.state.filter} locks={this.state.locks}/>;
 				break;
 			case 'storage':
-				page = <Storage filter={this.state.filter} operations={this.state.storage}/>;
+				page = <Storage filter={this.state.filter}
+								operations={this.state.storage}/>;
 				break;
 			default:
 				page = <div>Unknown page</div>;
@@ -104,8 +106,11 @@ export class App extends Component {
 				</SideBar>
 
 				<ControlBar>
-					<input type="text" placeholder="Search..."
-						   onChange={this.onFilterChange.bind(this)}/>
+					<div className={style.filterWrapper}>
+						<input className={style.filter} type="text"
+							   placeholder="Filter path..."
+							   onChange={this.onFilterChange.bind(this)}/>
+					</div>
 				</ControlBar>
 
 				<Content>

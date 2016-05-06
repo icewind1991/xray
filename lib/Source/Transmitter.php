@@ -39,6 +39,7 @@ class Transmitter {
 
 	public function transmitLocks() {
 		$this->injector->injectStorageWrapper(function ($operation, $path, $type, $success, $stack) {
+			$requestId = \OC::$server->getRequest()->getId();
 			$this->queue->push([
 				'type' => self::TYPE_LOCK,
 				'data' => [
@@ -47,17 +48,20 @@ class Transmitter {
 					'path' => $path,
 					'type' => $type,
 					'success' => $success,
-					'stack' => $stack
+					'stack' => $stack,
+					'request' => $requestId
 				]
 			]);
 		}, function ($operation, $path, $stack) {
+			$requestId = \OC::$server->getRequest()->getId();
 			$this->queue->push([
 				'type' => self::TYPE_STORAGE,
 				'data' => [
 					'time' => microtime(true),
 					'operation' => $operation,
 					'path' => $path,
-					'stack' => $stack
+					'stack' => $stack,
+					'request' => $requestId
 				]
 			]);
 		});

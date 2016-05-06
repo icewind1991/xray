@@ -20,7 +20,7 @@ class LockRow extends Component {
 		} : () => {
 			this.setState({showState: !this.state.showState})
 		};
-		const className = (!entry.success) ? style.error : '';
+		const className = (!entry.success) ? style.error : 'req-' + entry.requestCounter;
 		const event = entry.operation;
 		let state = '';
 		if (this.state.showState) {
@@ -33,7 +33,7 @@ class LockRow extends Component {
 		}
 
 		return (
-			<tr key={key} className={className}
+			<tr key={key} className={style[className]}
 				onClick={onClick}>
 				<td className={style.time}><Timestamp
 					value={entry.time * 1000}
