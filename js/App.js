@@ -26,6 +26,7 @@ export class App extends Component {
 
 	state = {
 		live: true,
+		filter: '',
 		page: 'lock', // lazy mans routing
 		locks: [],
 		storage: []
@@ -66,14 +67,18 @@ export class App extends Component {
 		}
 	}
 
+	onFilterChange (event) {
+		this.setState({filter: event.target.value});
+	}
+
 	render () {
 		let page;
 		switch (this.state.page) {
 			case 'lock':
-				page = <Lock locks={this.state.locks}/>;
+				page = <Lock filter={this.state.filter} locks={this.state.locks}/>;
 				break;
 			case 'storage':
-				page = <Storage operations={this.state.storage}/>;
+				page = <Storage filter={this.state.filter} operations={this.state.storage}/>;
 				break;
 			default:
 				page = <div>Unknown page</div>;
@@ -99,7 +104,8 @@ export class App extends Component {
 				</SideBar>
 
 				<ControlBar>
-					<input type="text" placeholder={this.state.page}/>
+					<input type="text" placeholder="Search..."
+						   onChange={this.onFilterChange.bind(this)}/>
 				</ControlBar>
 
 				<Content>

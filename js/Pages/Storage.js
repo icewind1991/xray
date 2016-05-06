@@ -38,40 +38,48 @@ class StorageRow extends Component {
 				</td>
 			</tr>
 		)
-		};
-		}
+	};
+}
 
-		export default class Storage extends Component {
-			renderRow = (index, key) => {
-				return (
-					<StorageRow rowKey={key}
-								operation={this.props.operations[index]}/>
-				);
-			};
+export default class Storage extends Component {
+	renderRow = (index, key) => {
+		return (
+			<StorageRow rowKey={key}
+						operation={this.filteredRows[index]}/>
+		);
+	};
 
-			renderer = (items, ref) => {
-			return (<table className={style.lockTable}>
+	renderer = (items, ref) => {
+		return (<table className={style.lockTable}>
 			<thead>
 			<tr>
-			<th className={style.time}>Time</th>
-			<th className={style.event}>Event</th>
-			<th className={style.path}>Path</th>
+				<th className={style.time}>Time</th>
+				<th className={style.event}>Event</th>
+				<th className={style.path}>Path</th>
 			</tr>
 			</thead>
 			<tbody ref={ref}>
 			{items}
 			</tbody>
-			</table>);
-		};
+		</table>);
+	};
 
-			render () {
-			return (
+	render () {
+		if (this.props.filter) {
+			this.filteredRows = this.props.operations.filter(lock => {
+				return lock.path.indexOf(this.props.filter) !== -1;
+			});
+		} else {
+			this.filteredRows = this.props.operations;
+		}
+
+		return (
 			<ReactList
-			itemRenderer={this.renderRow}
-			itemsRenderer={this.renderer}
-			length={this.props.operations.length}
-			type='uniform'
+				itemRenderer={this.renderRow}
+				itemsRenderer={this.renderer}
+				length={this.filteredRows.length}
+				type='uniform'
 			/>
-			);
-		}
-		}
+		);
+	}
+}

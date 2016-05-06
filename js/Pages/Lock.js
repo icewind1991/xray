@@ -24,7 +24,8 @@ class LockRow extends Component {
 		const event = entry.operation;
 		let state = '';
 		if (this.state.showState) {
-			state = (<LockState locks={this.props.locks} lock={this.props.lock}/>);
+			state = (
+				<LockState locks={this.props.locks} lock={this.props.lock}/>);
 		}
 		let trace = '';
 		if (this.state.showState) {
@@ -58,9 +59,12 @@ class LockRow extends Component {
 }
 
 export default class Lock extends Component {
+	filteredRows = [];
+
 	renderRow = (index, key) => {
 		return (
-			<LockRow rowKey={key} locks={this.props.locks} lock={this.props.locks[index]}/>
+			<LockRow rowKey={key} locks={this.props.locks}
+					 lock={this.filteredRows[index]}/>
 		);
 	};
 
@@ -81,11 +85,19 @@ export default class Lock extends Component {
 	};
 
 	render () {
+		if (this.props.filter) {
+			this.filteredRows = this.props.locks.filter(lock => {
+				return lock.path.indexOf(this.props.filter) !== -1;
+			});
+		} else {
+			this.filteredRows = this.props.locks;
+		}
+
 		return (
 			<ReactList
 				itemRenderer={this.renderRow}
 				itemsRenderer={this.renderer}
-				length={this.props.locks.length}
+				length={this.filteredRows.length}
 				type='uniform'
 			/>
 		);
