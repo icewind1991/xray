@@ -52,15 +52,30 @@ class StorageWrapper extends Wrapper {
 		parent::__construct($arguments);
 	}
 
+	private function getStack() {
+		$stack = debug_backtrace();
+		$stack = array_slice($stack, 2);
+		$rootLength = strlen(\OC::$SERVERROOT);
+		return array_map(function ($trace) use ($rootLength) {
+			return [
+				'file' => substr($trace['file'], $rootLength),
+				'line' => $trace['line'],
+				'class' => $trace['class'],
+				'function' => $trace['function'],
+				'type' => $trace['type']
+			];
+		}, $stack);
+	}
+
 	private function emitStorage($operation, $path) {
 		$callback = $this->storageCallback;
-		$callback($operation, $this->mountPoint . $path);
+		$callback($operation, $this->mountPoint . $path, $this->getStack());
 	}
 
 
 	private function emitStorageTwoPaths($operation, $path1, $path2) {
 		$callback = $this->storageCallback;
-		$callback($operation, $this->mountPoint . $path1, $this->mountPoint . $path2);
+		$callback($operation, $this->mountPoint . $path1, $this->mountPoint . $path2, $this->getStack());
 	}
 
 	/**
@@ -472,9 +487,9 @@ class StorageWrapper extends Wrapper {
 		$callback = $this->lockCallback;
 		try {
 			$provider->acquireLock('files/' . md5($this->getId() . '::' . trim($path, '/')), $type);
-			$callback(self::LOCK_ACQUIRE, $this->mountPoint . $path, $type, true);
+			$callback(self::LOCK_ACQUIRE, $this->mountPoint . $path, $type, true, $this->getStack());
 		} catch (LockedException $e) {
-			$callback(self::LOCK_ACQUIRE, $this->mountPoint . $path, $type, false);
+			$callback(self::LOCK_ACQUIRE, $this->mountPoint . $path, $type, false, $this->getStack());
 			throw $e;
 		}
 	}
@@ -488,9 +503,9 @@ class StorageWrapper extends Wrapper {
 		$callback = $this->lockCallback;
 		try {
 			$provider->releaseLock('files/' . md5($this->getId() . '::' . trim($path, '/')), $type);
-			$callback(self::LOCK_RELEASE, $this->mountPoint . $path, $type, true);
+			$callback(self::LOCK_RELEASE, $this->mountPoint . $path, $type, true, $this->getStack());
 		} catch (LockedException $e) {
-			$callback(self::LOCK_RELEASE, $this->mountPoint . $path, $type, false);
+			$callback(self::LOCK_RELEASE, $this->mountPoint . $path, $type, false, $this->getStack());
 			throw $e;
 		}
 	}
@@ -504,9 +519,9 @@ class StorageWrapper extends Wrapper {
 		$callback = $this->lockCallback;
 		try {
 			$provider->changeLock('files/' . md5($this->getId() . '::' . trim($path, '/')), $type);
-			$callback(self::LOCK_CHANGE, $this->mountPoint . $path, $type, true);
+			$callback(self::LOCK_CHANGE, $this->mountPoint . $path, $type, true, $this->getStack());
 		} catch (LockedException $e) {
-			$callback(self::LOCK_CHANGE, $this->mountPoint . $path, $type, false);
+			$callback(self::LOCK_CHANGE, $this->mountPoint . $path, $type, false, $this->getStack());
 			throw $e;
 		}
 	}

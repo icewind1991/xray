@@ -12,8 +12,6 @@ import {
 
 import DataProvider from './DataProvider';
 
-import {LockType} from './Components/LockType';
-import {LockState} from './Components/LockState'
 import {ToggleEntry} from './Components/ToggleEntry';
 
 import Lock from './Pages/Lock';
@@ -22,7 +20,12 @@ import Storage from './Pages/Storage';
 import style from '../css/app.less';
 
 export class App extends Component {
+	live = true;
+	locks = [];
+	storage = [];
+
 	state = {
+		live: true,
 		page: 'lock', // lazy mans routing
 		locks: [],
 		storage: []
@@ -34,14 +37,16 @@ export class App extends Component {
 	}
 
 	componentDidMount () {
-		let locks = [];
-		let storage = [];
 		this.source.listen((lock) => {
-			locks.unshift(lock);
-			this.setState({locks});
+			this.locks.unshift(lock);
+			if (this.live) {
+				this.setState({locks: this.locks});
+			}
 		}, storageOperation => {
-			storage.unshift(storageOperation);
-			this.setState({storage});
+			this.storage.unshift(storageOperation);
+			if (this.live) {
+				this.setState({storage: this.storage});
+			}
 		});
 	}
 
@@ -51,6 +56,13 @@ export class App extends Component {
 			this.setState({
 				page: page
 			});
+		}
+	}
+
+	toggleLive (live) {
+		this.live = live;
+		if (live) {
+			this.setState({locks: this.locks, storage: this.storage});
 		}
 	}
 
@@ -70,6 +82,10 @@ export class App extends Component {
 		return (
 			<AppContainer appId="xray">
 				<SideBar withIcon={true}>
+					<ToggleEntry onChange={this.toggleLive.bind(this)}
+								 active={this.live}>Live
+						Updates</ToggleEntry>
+					<Separator/>
 					<Entry key={1} icon="home"
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
 					<Entry key={2} icon="link"

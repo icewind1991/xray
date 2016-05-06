@@ -5,6 +5,7 @@ import Timestamp from 'react-time';
 import LockType from '../Components/LockType';
 import EventType from '../Components/LockEventType';
 import LockState from '../Components/LockState';
+import StackTrace from '../Components/StackTrace';
 import style from './Lock.less';
 
 class LockRow extends Component {
@@ -25,6 +26,11 @@ class LockRow extends Component {
 		if (this.state.showState) {
 			state = (<LockState locks={this.props.locks} lock={this.props.lock}/>);
 		}
+		let trace = '';
+		if (this.state.showState) {
+			trace = (<StackTrace trace={entry.stack}/>);
+		}
+
 		return (
 			<tr key={key} className={className}
 				onClick={onClick}>
@@ -38,7 +44,10 @@ class LockRow extends Component {
 				</td>
 				<td className={style.path}>
 					{entry.path}
-					{state}
+					<div className={style.info}>
+						{state}
+						{trace}
+					</div>
 				</td>
 				<td className={style.type}>
 					<LockType type={entry.type}/>
