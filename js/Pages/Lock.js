@@ -3,23 +3,28 @@ import {Component} from 'react';
 import ReactList from 'react-list'
 import Timestamp from 'react-time';
 import LockType from '../Components/LockType';
-import style from '../../css/app.less';
+import EventType from '../Components/EventType';
+import LockState from '../Components/LockState';
+import style from './Lock.less';
 
-export default class Lock extends Component {
+class LockRow extends Component {
 	state = {
-		showState: 0
+		showState: false
 	};
 
-	toggleShowState (showState) {
-		this.setState({showState});
-	}
-
-	renderRow = (index, key) => {
-		const entry = this.props.locks[index];
+	render = () => {
+		const key = this.props.rowKey;
+		const entry = this.props.lock;
 		const onClick = (entry.event === 'error') ? function () {
-		} : this.toggleShowState.bind(this, key);
+		} : () => {
+			this.setState({showState: !this.state.showState})
+		};
 		const className = (!entry.success) ? style.error : '';
-		const event = (!entry.success) ? 'Error on ' + entry.operation : entry.operation;
+		const event = entry.operation;
+		let state = '';
+		if (this.state.showState) {
+			state = (<LockState locks={this.props.locks} lock={this.props.lock}/>);
+		}
 		return (
 			<tr key={key} className={className}
 				onClick={onClick}>
@@ -28,17 +33,30 @@ export default class Lock extends Component {
 					relative
 					titleFormat="HH:mm:ss.SSS"/>
 				</td>
-				<td className={style.event}>{event}</td>
-				<td className={style.path}>{entry.path}</td>
+				<td className={style.event}>
+					<EventType type={event}/>
+				</td>
+				<td className={style.path}>
+					{entry.path}
+					{state}
+				</td>
 				<td className={style.type}>
 					<LockType type={entry.type}/>
 				</td>
 			</tr>
 		)
 	};
+}
+
+export default class Lock extends Component {
+	renderRow = (index, key) => {
+		return (
+			<LockRow rowKey={key} locks={this.props.locks} lock={this.props.locks[index]}/>
+		);
+	};
 
 	renderer = (items, ref) => {
-		return (<table className={style.locklog}>
+		return (<table className={style.lockTable}>
 			<thead>
 			<tr>
 				<th className={style.time}>Time</th>

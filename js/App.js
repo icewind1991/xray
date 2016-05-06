@@ -32,9 +32,9 @@ export class App extends Component {
 	}
 
 	componentDidMount () {
+		let locks = [];
 		this.source.listen((lock) => {
-			let locks = this.state.locks;
-			locks.push(lock);
+			locks.unshift(lock);
 			this.setState({locks});
 		});
 	}
@@ -80,8 +80,6 @@ export class App extends Component {
 				</ControlBar>
 
 				<Content>
-					<h1 className={style.header}>{this.state.page}</h1>
-
 					{page}
 				</Content>
 			</AppContainer>

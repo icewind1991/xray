@@ -23,7 +23,7 @@ namespace OCA\XRay\Source;
 
 use OC\Files\Filesystem;
 use OC\Server;
-use OCA\XRay\Source\Lock\LockWrapper;
+use OCA\XRay\Source\StorageWrapper;
 use OCP\Files\Storage\IStorage;
 
 class Injector {
@@ -39,12 +39,13 @@ class Injector {
 		$this->server = $server;
 	}
 
-	public function injectLock(callable $callback) {
-		Filesystem::addStorageWrapper('xray_lock', function ($mountPoint, IStorage $storage) use ($callback) {
-			return new LockWrapper([
+	public function injectStorageWrapper(callable $lockCallback, callable $storageCallback) {
+		Filesystem::addStorageWrapper('xray_lock', function ($mountPoint, IStorage $storage) use ($lockCallback, $storageCallback) {
+			return new StorageWrapper([
 				'storage' => $storage,
 				'mountpoint' => $mountPoint,
-				'callback' => $callback
+				'lockCallback' => $lockCallback,
+				'storageCallback' => $storageCallback
 			]);
 		}, 99999); // always apply first
 	}

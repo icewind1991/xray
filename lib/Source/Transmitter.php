@@ -30,6 +30,7 @@ class Transmitter {
 	private $queue;
 
 	const TYPE_LOCK = 'lock';
+	const TYPE_STORAGE = 'storage';
 
 	public function __construct(Injector $injector, IQueue $queue) {
 		$this->injector = $injector;
@@ -37,15 +38,24 @@ class Transmitter {
 	}
 
 	public function transmitLocks() {
-		$this->injector->injectLock(function ($operation, $path, $type, $success) {
+		$this->injector->injectStorageWrapper(function ($operation, $path, $type, $success) {
 			$this->queue->push([
 				'type' => self::TYPE_LOCK,
 				'data' => [
-					'time' => time(),
+					'time' => microtime(true),
 					'operation' => $operation,
 					'path' => $path,
 					'type' => $type,
 					'success' => $success
+				]
+			]);
+		}, function($operation, $path) {
+			$this->queue->push([
+				'type' => self::TYPE_STORAGE,
+				'data' => [
+					'time' => microtime(true),
+					'operation' => $operation,
+					'path' => $path
 				]
 			]);
 		});

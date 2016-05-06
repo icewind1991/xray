@@ -69,10 +69,12 @@
     "babel-runtime": "^6.6.1",
     "bluebird": "^3.3.5",
     "event-source": "^0.1.1",
+    "litesocket": "^0.9.3",
     "oc-react-components": "^0.2.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
     "react-list": "^0.7.18",
-    "react-time": "^4.0.2"
+    "react-time": "^4.0.2",
+    "redis": "^2.6.0-2"
   }
 }

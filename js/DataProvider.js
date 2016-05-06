@@ -62,8 +62,8 @@ export default class DataProvider {
 	listen (lockCb) {
 		this.listening = true;
 
-		const source = new EventSource(OC.generateUrl(`/apps/xray/listen?historySize=128`));
-		// const source = new EventSource(`http://localhost/owncloud/apps/xray/listen?historySize=128`));
+		// const source = new EventSource(OC.generateUrl(`/apps/xray/listen?historySize=128`));
+		const source = new EventSource(`http://localhost:3003`);
 		source.addEventListener('__internal__', (data) => {
 			if (data === 'close') {
 				console.log('closed from remote');
