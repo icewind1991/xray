@@ -17,13 +17,15 @@ import {LockState} from './Components/LockState'
 import {ToggleEntry} from './Components/ToggleEntry';
 
 import Lock from './Pages/Lock';
+import Storage from './Pages/Storage';
 
 import style from '../css/app.less';
 
 export class App extends Component {
 	state = {
 		page: 'lock', // lazy mans routing
-		locks: []
+		locks: [],
+		storage: []
 	};
 
 	constructor () {
@@ -33,16 +35,23 @@ export class App extends Component {
 
 	componentDidMount () {
 		let locks = [];
+		let storage = [];
 		this.source.listen((lock) => {
 			locks.unshift(lock);
 			this.setState({locks});
+		}, storageOperation => {
+			storage.unshift(storageOperation);
+			this.setState({storage});
 		});
 	}
 
-	onClick (page) {
-		this.setState({
-			page: page
-		});
+	onClick (page, e) {
+		e.preventDefault();
+		if (this.state.page !== page) {
+			this.setState({
+				page: page
+			});
+		}
 	}
 
 	render () {
@@ -50,6 +59,9 @@ export class App extends Component {
 		switch (this.state.page) {
 			case 'lock':
 				page = <Lock locks={this.state.locks}/>;
+				break;
+			case 'storage':
+				page = <Storage operations={this.state.storage}/>;
 				break;
 			default:
 				page = <div>Unknown page</div>;
@@ -61,12 +73,7 @@ export class App extends Component {
 					<Entry key={1} icon="home"
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
 					<Entry key={2} icon="link"
-						   onClick={this.onClick.bind(this,'link')}>Entry2</Entry>
-					<Separator/>
-					<Entry key={3} icon="folder"
-						   onClick={this.onClick.bind(this,'folder')}>Entry3</Entry>
-					<Entry key={4} icon="user"
-						   onClick={this.onClick.bind(this,'user')}>Entry4</Entry>
+						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
 
 					<Settings>
 						<h2>
@@ -76,7 +83,7 @@ export class App extends Component {
 				</SideBar>
 
 				<ControlBar>
-					<input type="text" placeholder="foo"/>
+					<input type="text" placeholder={this.state.page}/>
 				</ControlBar>
 
 				<Content>
