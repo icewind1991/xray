@@ -22,24 +22,40 @@
 namespace OCA\XRay\Source;
 
 use OCA\XRay\Queue\IQueue;
+use OCP\IRequest;
 
 class Transmitter {
 	/** @var Injector */
 	private $injector;
 	/** @var IQueue */
 	private $queue;
+	/** @var IRequest */
+	private $request;
 
 	const TYPE_LOCK = 'lock';
 	const TYPE_STORAGE = 'storage';
+	const TYPE_REQUEST = 'request';
 
-	public function __construct(Injector $injector, IQueue $queue) {
+	public function __construct(Injector $injector, IQueue $queue, IRequest $request) {
 		$this->injector = $injector;
 		$this->queue = $queue;
+		$this->request = $request;
+	}
+
+	public function startRequest() {
+		$this->queue->push([
+			'type' => self::TYPE_REQUEST,
+			'data' => [
+				'path' => $this->request->getRawPathInfo(),
+				'time' => microtime(true),
+				'id' => $this->request->getId()
+			]
+		]);
 	}
 
 	public function transmitLocks() {
 		$this->injector->injectStorageWrapper(function ($operation, $path, $type, $success, $stack) {
-			$requestId = \OC::$server->getRequest()->getId();
+			$requestId = $this->request->getId();
 			$this->queue->push([
 				'type' => self::TYPE_LOCK,
 				'data' => [
@@ -53,7 +69,7 @@ class Transmitter {
 				]
 			]);
 		}, function ($operation, $path, $stack) {
-			$requestId = \OC::$server->getRequest()->getId();
+			$requestId = $this->request->getId();
 			$this->queue->push([
 				'type' => self::TYPE_STORAGE,
 				'data' => [

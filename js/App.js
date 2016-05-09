@@ -43,6 +43,9 @@ export class App extends Component {
 	initRequest (request) {
 		if (!this.requests[request]) {
 			this.requests[request] = {
+				id: request,
+				time: 0,
+				path: '',
 				locks: [],
 				storage: [],
 				cache: []
@@ -65,6 +68,10 @@ export class App extends Component {
 			if (this.live) {
 				this.setState({storage: this.storage, requests: this.requests});
 			}
+		}, request => {
+			this.initRequest(request.id);
+			this.requests[request.id].time = request.time;
+			this.requests[request.id].path = request.path;
 		});
 	}
 
@@ -88,11 +95,16 @@ export class App extends Component {
 		this.setState({filter: event.target.value});
 	}
 
+	getRequests () {
+		return Object.values(this.state.requests).sort((a, b)=>b.time - a.time);
+	}
+
 	render () {
 		let page;
 		switch (this.state.page) {
 			case 'request':
-				page = <Request requests={this.state.requests}/>;
+				page = <Request filter={this.state.filter}
+								items={this.getRequests()}/>;
 				break;
 			case 'lock':
 				page =

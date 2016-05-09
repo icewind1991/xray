@@ -70,7 +70,7 @@ export class TablePage extends Component {
 			if (style[className]) {
 				return <th className={style[className]}>{column}</th>
 			} else {
-				return <th>{className}</th>
+				return <th>{column}</th>
 			}
 		});
 		return (<table className={style.lockTable}>
@@ -88,7 +88,7 @@ export class TablePage extends Component {
 	render () {
 		if (this.props.filter) {
 			this.filteredRows = this.props.items.filter(item => {
-				return item.path.indexOf(this.items.filter) !== -1;
+				return item.path.indexOf(this.props.filter) !== -1;
 			});
 		} else {
 			this.filteredRows = this.props.items;

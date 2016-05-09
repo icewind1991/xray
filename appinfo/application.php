@@ -47,7 +47,7 @@ class Application extends App {
 		});
 
 		$container->registerService('Transmitter', function (SimpleContainer $c) use ($server) {
-			return new Transmitter($this->getInjector(), $this->getQueue());
+			return new Transmitter($this->getInjector(), $this->getQueue(), $server->getRequest());
 		});
 
 		$container->registerService('PageController', function (SimpleContainer $c) use ($server) {
@@ -86,6 +86,7 @@ class Application extends App {
 
 	public function registerSources() {
 		$transmitter = $this->getTransmitter();
+		$transmitter->startRequest();
 
 		\OCP\Util::connectHook('OC_Filesystem', 'preSetup', $transmitter, 'transmitLocks');
 	}
