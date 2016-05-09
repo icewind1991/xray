@@ -32,6 +32,8 @@ export class Row extends Component {
 
 		const body = this.getBody(item);
 
+		const classTable = style[this.getClassName(item)] + ((this.props.className) ? ' ' + this.props.className : '');
+
 		const columns = this.columns.map((column, i) => {
 			const className = column.toLowerCase();
 			let details = '';
@@ -47,7 +49,7 @@ export class Row extends Component {
 		});
 
 		return (
-			<tr key={key} className={style[this.getClassName(item)]}
+			<tr key={key} className={classTable}
 				onClick={this.onClick}>
 				{columns}
 			</tr>
@@ -73,7 +75,8 @@ export class TablePage extends Component {
 				return <th>{column}</th>
 			}
 		});
-		return (<table className={style.lockTable}>
+		const classTable = style.lockTable + ((this.props.className) ? ' ' + this.props.className : '');
+		return (<table className={classTable}>
 			<thead>
 			<tr>
 				{columns}
@@ -94,13 +97,18 @@ export class TablePage extends Component {
 			this.filteredRows = this.props.items;
 		}
 
-		return (
-			<ReactList
-				itemRenderer={this.renderRow}
-				itemsRenderer={this.renderer}
-				length={this.filteredRows.length}
-				type='uniform'
-			/>
-		);
+		if (this.props.type === 'normal') {
+			const rows = this.filteredRows.map((item, i)=>this.renderRow(i, i));
+			return this.renderer(rows, this.ref);
+		} else {
+			return (
+				<ReactList
+					itemRenderer={this.renderRow}
+					itemsRenderer={this.renderer}
+					length={this.filteredRows.length}
+					type='uniform'
+				/>
+			);
+		}
 	}
 }

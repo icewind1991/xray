@@ -10,10 +10,19 @@ class RequestRow extends Row {
 	closeDetails = ()=> {
 		this.setState({showDetail: false});
 		this.props.toggleLive(true);
+		this.props.setHidden(false);
+	};
+
+	onClick = () => {
+		const showDetail = !this.state.showDetail;
+		if (showDetail) {
+			this.props.toggleLive(false);
+			this.props.setHidden(false);
+		}
+		this.setState({showDetail})
 	};
 
 	getDetails (item) {
-		this.props.toggleLive(false);
 		return (<SingleRequest close={this.closeDetails} request={item}/>);
 	}
 
@@ -30,12 +39,23 @@ class RequestRow extends Row {
 	}
 }
 
-export default class Lock extends TablePage {
+export default class Request extends TablePage {
+	state = {
+		hidden: false
+	};
+
+	setHidden = (hidden) => {
+		this.setState({hidden});
+	};
+
 	columns = ['Time', 'Path', 'Locks', 'Storage'];
 
 	renderRow = (index, key) => {
+		const className = (this.state.hidden) ? 'hidden' : '';
 		return (
-			<RequestRow key={key} rowKey={key} locks={this.props.items}
+			<RequestRow className={className} key={key} rowKey={key}
+						locks={this.props.items}
+						setHidden={this.setHidden}
 						toggleLive={this.props.toggleLive}
 						item={this.filteredRows[index]}/>
 		);

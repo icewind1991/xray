@@ -103,16 +103,16 @@ export class App extends Component {
 		let page;
 		switch (this.state.page) {
 			case 'request':
-				page = <Request filter={this.state.filter}
+				page = <Request type="normal" filter={this.state.filter}
 								toggleLive={this.toggleLive}
 								items={this.getRequests()}/>;
 				break;
 			case 'lock':
 				page =
-					<Lock filter={this.state.filter} items={this.state.locks}/>;
+					<Lock type="normal" filter={this.state.filter} items={this.state.locks}/>;
 				break;
 			case 'storage':
-				page = <Storage filter={this.state.filter}
+				page = <Storage type="normal" filter={this.state.filter}
 								items={this.state.storage}/>;
 				break;
 			default:
@@ -128,7 +128,7 @@ export class App extends Component {
 					<Separator/>
 					<Entry key={1} icon="home"
 						   onClick={this.onClick.bind(this,'request')}>Requests</Entry>
-					<Entry key={2} icon="home"
+					<Entry key={2} icon="password"
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
 					<Entry key={3} icon="link"
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
