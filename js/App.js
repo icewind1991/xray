@@ -54,21 +54,27 @@ export class App extends Component {
 		}
 	}
 
+	updateState = _.throttle(() => { //batch state updates
+		if (this.live) {
+			this.setState({
+				locks: this.locks,
+				requests: this.requests,
+				storage: this.storage
+			});
+		}
+	}, 100);
+
 	componentDidMount () {
 		this.source.listen((lock) => {
 			this.locks.unshift(lock);
 			this.initRequest(lock.request);
 			this.requests[lock.request].locks.push(lock);
-			if (this.live) {
-				this.setState({locks: this.locks, requests: this.requests});
-			}
+			this.updateState();
 		}, storageOperation => {
 			this.storage.unshift(storageOperation);
 			this.initRequest(storageOperation.request);
 			this.requests[storageOperation.request].storage.push(storageOperation);
-			if (this.live) {
-				this.setState({storage: this.storage, requests: this.requests});
-			}
+			this.updateState();
 		}, request => {
 			this.initRequest(request.id);
 			Object.assign(this.requests[request.id], request);
