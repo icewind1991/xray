@@ -4,8 +4,8 @@
     "lint": "eslint -c .eslintrc js",
     "watch-client": "node ./node_modules/better-npm-run watch-client",
     "proxy": "node ./node_modules/better-npm-run proxy",
-    "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run proxy\"",
-    "configure": "node ./configure.js"
+    "source": "node ./js/Source.js",
+    "dev": "concurrent --kill-others \"npm run watch-client\" \"npm run proxy\" \"npm run source\""
   },
   "betterScripts": {
     "build": {

@@ -16,6 +16,7 @@ import {ToggleEntry} from './Components/ToggleEntry';
 
 import Lock from './Pages/Lock';
 import Storage from './Pages/Storage';
+import Request from './Pages/Request';
 
 import style from '../css/app.less';
 
@@ -23,13 +24,15 @@ export class App extends Component {
 	live = true;
 	locks = [];
 	storage = [];
+	requests = [];
 
 	state = {
 		live: true,
 		filter: '',
-		page: 'lock', // lazy mans routing
+		page: 'request', // lazy mans routing
 		locks: [],
-		storage: []
+		storage: [],
+		requests: []
 	};
 
 	constructor () {
@@ -37,16 +40,30 @@ export class App extends Component {
 		this.source = new DataProvider();
 	}
 
+	initRequest (request) {
+		if (!this.requests[request]) {
+			this.requests[request] = {
+				locks: [],
+				storage: [],
+				cache: []
+			};
+		}
+	}
+
 	componentDidMount () {
 		this.source.listen((lock) => {
 			this.locks.unshift(lock);
+			this.initRequest(lock.request);
+			this.requests[lock.request].locks.push(lock);
 			if (this.live) {
-				this.setState({locks: this.locks});
+				this.setState({locks: this.locks, requests: this.requests});
 			}
 		}, storageOperation => {
 			this.storage.unshift(storageOperation);
+			this.initRequest(storageOperation.request);
+			this.requests[storageOperation.request].storage.push(storageOperation);
 			if (this.live) {
-				this.setState({storage: this.storage});
+				this.setState({storage: this.storage, requests: this.requests});
 			}
 		});
 	}
@@ -74,13 +91,16 @@ export class App extends Component {
 	render () {
 		let page;
 		switch (this.state.page) {
+			case 'request':
+				page = <Request requests={this.state.requests}/>;
+				break;
 			case 'lock':
 				page =
-					<Lock filter={this.state.filter} locks={this.state.locks}/>;
+					<Lock filter={this.state.filter} items={this.state.locks}/>;
 				break;
 			case 'storage':
 				page = <Storage filter={this.state.filter}
-								operations={this.state.storage}/>;
+								items={this.state.storage}/>;
 				break;
 			default:
 				page = <div>Unknown page</div>;
@@ -94,8 +114,10 @@ export class App extends Component {
 						Updates</ToggleEntry>
 					<Separator/>
 					<Entry key={1} icon="home"
+						   onClick={this.onClick.bind(this,'request')}>Requests</Entry>
+					<Entry key={2} icon="home"
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
-					<Entry key={2} icon="link"
+					<Entry key={3} icon="link"
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
 
 					<Settings>
