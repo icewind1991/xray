@@ -25,6 +25,7 @@ export class App extends Component {
 	locks = [];
 	storage = [];
 	requests = [];
+	pause = false;
 
 	state = {
 		live: true,
@@ -70,8 +71,7 @@ export class App extends Component {
 			}
 		}, request => {
 			this.initRequest(request.id);
-			this.requests[request.id].time = request.time;
-			this.requests[request.id].path = request.path;
+			Object.assign(this.requests[request.id], request);
 		});
 	}
 
@@ -84,12 +84,12 @@ export class App extends Component {
 		}
 	}
 
-	toggleLive (live) {
+	toggleLive = (live) => {
 		this.live = live;
 		if (live) {
 			this.setState({locks: this.locks, storage: this.storage});
 		}
-	}
+	};
 
 	onFilterChange (event) {
 		this.setState({filter: event.target.value});
@@ -104,6 +104,7 @@ export class App extends Component {
 		switch (this.state.page) {
 			case 'request':
 				page = <Request filter={this.state.filter}
+								toggleLive={this.toggleLive}
 								items={this.getRequests()}/>;
 				break;
 			case 'lock':

@@ -1,5 +1,3 @@
-import {Component} from 'react';
-
 import Timestamp from 'react-time';
 import StackTrace from '../Components/StackTrace';
 import {TablePage, Row} from './TablePage';

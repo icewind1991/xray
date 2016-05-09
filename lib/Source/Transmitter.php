@@ -48,7 +48,9 @@ class Transmitter {
 			'data' => [
 				'path' => $this->request->getRawPathInfo(),
 				'time' => microtime(true),
-				'id' => $this->request->getId()
+				'id' => $this->request->getId(),
+				'method' => $this->request->getMethod(),
+				'params' => $this->request->getParams()
 			]
 		]);
 	}

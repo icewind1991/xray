@@ -1,15 +1,20 @@
-import {Component} from 'react';
-
 import Timestamp from 'react-time';
 
 import {TablePage, Row} from './TablePage';
 
+import SingleRequest from './SingleRequest';
+
 class RequestRow extends Row {
 	columns = ['Time', 'Path', 'Locks', 'Storage'];
 
+	closeDetails = ()=> {
+		this.setState({showDetail: false});
+		this.props.toggleLive(true);
+	};
+
 	getDetails (item) {
-		return <div>
-		</div>;
+		this.props.toggleLive(false);
+		return (<SingleRequest close={this.closeDetails} request={item}/>);
 	}
 
 	getBody (item) {
@@ -20,7 +25,7 @@ class RequestRow extends Row {
 				titleFormat="HH:mm:ss.SSS"/>,
 			path: item.path,
 			locks: item.locks.length,
-			storage: item.storage.length,
+			storage: item.storage.length
 		}
 	}
 }
@@ -31,6 +36,7 @@ export default class Lock extends TablePage {
 	renderRow = (index, key) => {
 		return (
 			<RequestRow key={key} rowKey={key} locks={this.props.items}
+						toggleLive={this.props.toggleLive}
 						item={this.filteredRows[index]}/>
 		);
 	};
