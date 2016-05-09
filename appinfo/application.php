@@ -43,7 +43,7 @@ class Application extends App {
 
 		$container->registerService('Queue', function (SimpleContainer $c) use ($server) {
 			$redis = $server->getGetRedisFactory()->getInstance();
-			return new RedisQueue($redis, 'xray', 128);
+			return new RedisQueue($redis, 'xray', 512);
 		});
 
 		$container->registerService('Transmitter', function (SimpleContainer $c) use ($server) {

@@ -5,7 +5,7 @@ var history = redis.createClient();
 sub.subscribe("xray");
 
 function getHistory (cb) {
-	history.lrange('xray_history', 0, 128, (err, res) => cb(
+	history.lrange('xray_history', 0, 512, (err, res) => cb(
 		res.map(JSON.parse)
 	));
 }

@@ -103,16 +103,16 @@ export class App extends Component {
 		let page;
 		switch (this.state.page) {
 			case 'request':
-				page = <Request type="normal" filter={this.state.filter}
+				page = <Request filter={this.state.filter}
 								toggleLive={this.toggleLive}
 								items={this.getRequests()}/>;
 				break;
 			case 'lock':
 				page =
-					<Lock type="normal" filter={this.state.filter} items={this.state.locks}/>;
+					<Lock filter={this.state.filter} items={this.state.locks}/>;
 				break;
 			case 'storage':
-				page = <Storage type="normal" filter={this.state.filter}
+				page = <Storage filter={this.state.filter}
 								items={this.state.storage}/>;
 				break;
 			default:
