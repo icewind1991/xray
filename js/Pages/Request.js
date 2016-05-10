@@ -5,7 +5,7 @@ import {TablePage, Row} from './TablePage';
 import SingleRequest from './SingleRequest';
 
 class RequestRow extends Row {
-	columns = ['Time', 'Path', 'Locks', 'Storage'];
+	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache'];
 
 	closeDetails = ()=> {
 		this.setState({showDetail: false});
@@ -26,13 +26,14 @@ class RequestRow extends Row {
 				titleFormat="HH:mm:ss.SSS"/>,
 			path: item.path,
 			locks: item.locks.length,
-			storage: item.storage.length
+			storage: item.storage.length,
+			cache: item.cache.length
 		}
 	}
 }
 
 export default class Request extends TablePage {
-	columns = ['Time', 'Path', 'Locks', 'Storage'];
+	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache'];
 
 	renderRow = (index, key) => {
 		return (

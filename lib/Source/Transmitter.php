@@ -35,6 +35,7 @@ class Transmitter {
 	const TYPE_LOCK = 'lock';
 	const TYPE_STORAGE = 'storage';
 	const TYPE_REQUEST = 'request';
+	const TYPE_CACHE = 'cache';
 
 	public function __construct(Injector $injector, IQueue $queue, IRequest $request) {
 		$this->injector = $injector;
@@ -74,6 +75,18 @@ class Transmitter {
 			$requestId = $this->request->getId();
 			$this->queue->push([
 				'type' => self::TYPE_STORAGE,
+				'data' => [
+					'time' => microtime(true),
+					'operation' => $operation,
+					'path' => $path,
+					'stack' => $stack,
+					'request' => $requestId
+				]
+			]);
+		}, function ($operation, $path, $stack) {
+			$requestId = $this->request->getId();
+			$this->queue->push([
+				'type' => self::TYPE_CACHE,
 				'data' => [
 					'time' => microtime(true),
 					'operation' => $operation,

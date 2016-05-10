@@ -2,6 +2,7 @@ import {Component} from 'react';
 
 import LockTable from './Lock';
 import StorageTable from './Storage';
+import CacheTable from './Cache';
 
 import style from './Request.less';
 
@@ -21,6 +22,10 @@ export default class SingleRequest extends Component {
 		const storage = (request.storage.length > 0) ?
 			<StorageTable type="normal" filter="" items={request.storage}/> :
 			<p className={style.none}>No Storage operations</p>;
+
+		const cache = (request.cache.length > 0) ?
+			<CacheTable type="normal" filter="" items={request.cache}/> :
+			<p className={style.none}>No Cache operations</p>;
 
 		delete request.params['v'];
 
@@ -59,6 +64,8 @@ export default class SingleRequest extends Component {
 			{locks}
 			<h2 className={style.category}>Storage</h2>
 			{storage}
+			<h2 className={style.category}>Cache</h2>
+			{cache}
 		</div>);
 	}
 }

@@ -17,6 +17,7 @@ import {ToggleEntry} from './Components/ToggleEntry';
 import Lock from './Pages/Lock';
 import Storage from './Pages/Storage';
 import Request from './Pages/Request';
+import Cache from './Pages/Cache';
 
 import style from '../css/app.less';
 
@@ -24,6 +25,7 @@ export class App extends Component {
 	live = true;
 	locks = [];
 	storage = [];
+	cache = [];
 	requests = [];
 	pause = false;
 
@@ -33,7 +35,8 @@ export class App extends Component {
 		page: 'request', // lazy mans routing
 		locks: [],
 		storage: [],
-		requests: []
+		requests: [],
+		cache: []
 	};
 
 	constructor () {
@@ -59,7 +62,8 @@ export class App extends Component {
 			this.setState({
 				locks: this.locks,
 				requests: this.requests,
-				storage: this.storage
+				storage: this.storage,
+				cache: this.cache
 			});
 		}
 	}, 100);
@@ -78,6 +82,11 @@ export class App extends Component {
 		}, request => {
 			this.initRequest(request.id);
 			Object.assign(this.requests[request.id], request);
+		}, cacheOperation => {
+			this.cache.unshift(cacheOperation);
+			this.initRequest(cacheOperation.request);
+			this.requests[cacheOperation.request].cache.push(cacheOperation);
+			this.updateState();
 		});
 	}
 
@@ -93,7 +102,7 @@ export class App extends Component {
 	toggleLive = (live) => {
 		this.live = live;
 		if (live) {
-			this.setState({locks: this.locks, storage: this.storage});
+			this.updateState();
 		}
 	};
 
@@ -121,6 +130,10 @@ export class App extends Component {
 				page = <Storage filter={this.state.filter}
 								items={this.state.storage}/>;
 				break;
+			case 'cache':
+				page = <Cache filter={this.state.filter}
+							  items={this.state.cache}/>;
+				break;
 			default:
 				page = <div>Unknown page</div>;
 		}
@@ -138,6 +151,8 @@ export class App extends Component {
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
 					<Entry key={3} icon="link"
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
+					<Entry key={4} icon="cache"
+						   onClick={this.onClick.bind(this,'cache')}>Cache</Entry>
 
 					<Settings>
 						<h2>

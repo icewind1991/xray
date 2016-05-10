@@ -39,13 +39,14 @@ class Injector {
 		$this->server = $server;
 	}
 
-	public function injectStorageWrapper(callable $lockCallback, callable $storageCallback) {
-		Filesystem::addStorageWrapper('xray_lock', function ($mountPoint, IStorage $storage) use ($lockCallback, $storageCallback) {
+	public function injectStorageWrapper(callable $lockCallback, callable $storageCallback, callable $cacheCallback) {
+		Filesystem::addStorageWrapper('xray_lock', function ($mountPoint, IStorage $storage) use ($lockCallback, $storageCallback, $cacheCallback) {
 			return new StorageWrapper([
 				'storage' => $storage,
 				'mountpoint' => $mountPoint,
 				'lockCallback' => $lockCallback,
-				'storageCallback' => $storageCallback
+				'storageCallback' => $storageCallback,
+				'cacheCallback' => $cacheCallback
 			]);
 		}, 99999); // always apply first
 	}

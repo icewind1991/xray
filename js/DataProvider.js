@@ -4,7 +4,7 @@ export default class DataProvider {
 	listening = false;
 	source = null;
 
-	listen (lockCb, storageCb, requestCb) {
+	listen (lockCb, storageCb, requestCb, cacheCb) {
 		if (this.listening) {
 			return;
 		}
@@ -42,6 +42,17 @@ export default class DataProvider {
 				}
 				lock.requestCounter = requestCounter;
 				storageCb(lock);
+			}
+		});
+		source.addEventListener('cache', (e) => {
+			const lock = JSON.parse(e.data);
+			if (this.listening) {
+				if (lock.request !== lastRequest) {
+					requestCounter = 1 - requestCounter;
+					lastRequest = lock.request;
+				}
+				lock.requestCounter = requestCounter;
+				cacheCb(lock);
 			}
 		});
 		source.addEventListener('request', (e) => {

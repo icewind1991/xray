@@ -42,12 +42,16 @@ class StorageWrapper extends Wrapper {
 	/** @var mixed */
 	private $mountPoint;
 
+	/** @var callable */
+	private $cacheCallback;
+
 	/**
 	 * @param array $arguments
 	 */
 	public function __construct($arguments) {
 		$this->storageCallback = $arguments['storageCallback'];
 		$this->lockCallback = $arguments['lockCallback'];
+		$this->cacheCallback = $arguments['cacheCallback'];
 		$this->mountPoint = $arguments['mountpoint'];
 		parent::__construct($arguments);
 	}
@@ -311,7 +315,7 @@ class StorageWrapper extends Wrapper {
 	 * @return bool
 	 */
 	public function copy($path1, $path2) {
-		$this->emitStorageTwoPaths('copyb', $path1, $path2);
+		$this->emitStorageTwoPaths('copy', $path1, $path2);
 		return parent::copy($path1, $path2);
 	}
 
@@ -415,17 +419,6 @@ class StorageWrapper extends Wrapper {
 	}
 
 	/**
-	 * get a cache instance for the storage
-	 *
-	 * @param string $path
-	 * @param \OC\Files\Storage\Storage (optional) the storage to pass to the cache
-	 * @return \OC\Files\Cache\Cache
-	 */
-	public function getCache($path = '', $storage = null) {
-		return parent::getCache($path, $storage);
-	}
-
-	/**
 	 * get the ETag for a file or folder
 	 *
 	 * @param string $path
@@ -452,7 +445,7 @@ class StorageWrapper extends Wrapper {
 	 * @return bool
 	 */
 	public function copyFromStorage(\OCP\Files\Storage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
-		//todo
+		$this->emitStorageTwoPaths('copyFromStorage', $sourceInternalPath, $targetInternalPath);
 		return parent::copyFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
 	}
 
@@ -463,8 +456,13 @@ class StorageWrapper extends Wrapper {
 	 * @return bool
 	 */
 	public function moveFromStorage(\OCP\Files\Storage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
-		//todo
+		$this->emitStorageTwoPaths('moveFromStorage', $sourceInternalPath, $targetInternalPath);
 		return parent::moveFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
+	}
+
+	public function getCache($path = '', $storage = null) {
+		$parentCache = parent::getCache($path, $storage);
+		return new CacheWrapper($parentCache, $this->mountPoint, $this->cacheCallback);
 	}
 
 	/**
