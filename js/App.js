@@ -145,13 +145,13 @@ export class App extends Component {
 								 active={this.live}>Live
 						Updates</ToggleEntry>
 					<Separator/>
-					<Entry key={1} icon="home"
+					<Entry key={1}
 						   onClick={this.onClick.bind(this,'request')}>Requests</Entry>
-					<Entry key={2} icon="password"
+					<Entry key={2}
 						   onClick={this.onClick.bind(this,'lock')}>Locks</Entry>
-					<Entry key={3} icon="link"
+					<Entry key={3}
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
-					<Entry key={4} icon="cache"
+					<Entry key={4}
 						   onClick={this.onClick.bind(this,'cache')}>Cache</Entry>
 
 					<Settings>

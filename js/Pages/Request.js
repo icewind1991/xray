@@ -8,7 +8,6 @@ class RequestRow extends Row {
 	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache'];
 
 	closeDetails = ()=> {
-		this.setState({showDetail: false});
 		this.props.toggleLive(true);
 		this.props.setOverlay(null);
 	};
