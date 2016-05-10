@@ -43,23 +43,10 @@ class PageController extends Controller {
 		$this->queue = $queue;
 	}
 
-	/**
-	 * @NoCSRFRequired
-	 * @param int $historySize
-	 */
-	public function listen($historySize = 0) {
-		$eventSource = new EventSource();
+	public function history() {
+		$history = $this->queue->retrieveHistory();
 
-		if ($historySize > 0) {
-			$history = $this->queue->retrieveHistory($historySize);
-			foreach ($history as $item) {
-				$eventSource->send($item['type'], $item['data']);
-			}
-		}
-
-		$this->queue->listen(function ($item) use ($eventSource) {
-			$eventSource->send($item['type'], $item['data']);
-		});
+		return $history;
 	}
 
 	/**

@@ -36,7 +36,8 @@ export class App extends Component {
 		locks: [],
 		storage: [],
 		requests: [],
-		cache: []
+		cache: [],
+		allowLive: false
 	};
 
 	constructor () {
@@ -87,7 +88,7 @@ export class App extends Component {
 			this.initRequest(cacheOperation.request);
 			this.requests[cacheOperation.request].cache.push(cacheOperation);
 			this.updateState();
-		});
+		}, allowLive => {this.setState({allowLive})});
 	}
 
 	onClick (page, e) {
@@ -138,12 +139,16 @@ export class App extends Component {
 				page = <div>Unknown page</div>;
 		}
 
+		const toggleLive = (this.state.allowLive)?
+			<ToggleEntry onChange={this.toggleLive.bind(this)}
+						 active={this.live}>Live
+				Updates</ToggleEntry>:
+			'';
+
 		return (
 			<AppContainer appId="xray">
 				<SideBar withIcon={true}>
-					<ToggleEntry onChange={this.toggleLive.bind(this)}
-								 active={this.live}>Live
-						Updates</ToggleEntry>
+					{toggleLive}
 					<Separator/>
 					<Entry key={1}
 						   onClick={this.onClick.bind(this,'request')}>Requests</Entry>

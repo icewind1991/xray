@@ -4,65 +4,92 @@ export default class DataProvider {
 	listening = false;
 	source = null;
 
-	listen (lockCb, storageCb, requestCb, cacheCb) {
+	lastRequest = '';
+	requestCounter = 0;
+
+	listen (lockCb, storageCb, requestCb, cacheCb, allowLiveCb) {
 		if (this.listening) {
 			return;
 		}
 		this.listening = true;
 
-		// const source = new EventSource(OC.generateUrl(`/apps/xray/listen?historySize=128`));
 		const source = new EventSource(`http://localhost:3003`);
-		source.addEventListener('__internal__', (data) => {
-			if (data === 'close') {
-				console.log('closed from remote');
-				source.close();
-				setTimeout(this.listen.bind(this, cb), 100);
-			}
-		});
-
-		let lastRequest = '';
-		let requestCounter = 0;
+		source.onerror = () => {
+			source.close();
+			allowLiveCb(false);
+			$.get(OC.generateUrl(`/apps/xray/history`)).then(items=> {
+				items.forEach(item => {
+					switch (item.type) {
+						case 'request':
+							this.onRequest(requestCb, item.data);
+							break;
+						case 'storage':
+							this.onRequest(storageCb, item.data);
+							break;
+						case 'lock':
+							this.onRequest(requestCb, item.data);
+							break;
+						case 'cache':
+							this.onRequest(cacheCb, item.data);
+							break;
+					}
+				});
+			});
+		};
 		source.addEventListener('lock', (e) => {
-			const lock = JSON.parse(e.data);
-			if (this.listening) {
-				if (lock.request !== lastRequest) {
-					requestCounter = 1 - requestCounter;
-					lastRequest = lock.request;
-				}
-				lock.requestCounter = requestCounter;
-				lockCb(lock);
-			}
+			this.onRequest(lockCb, JSON.parse(e.data));
 		});
 		source.addEventListener('storage', (e) => {
-			const lock = JSON.parse(e.data);
-			if (this.listening) {
-				if (lock.request !== lastRequest) {
-					requestCounter = 1 - requestCounter;
-					lastRequest = lock.request;
-				}
-				lock.requestCounter = requestCounter;
-				storageCb(lock);
-			}
+			this.onRequest(storageCb, JSON.parse(e.data));
 		});
 		source.addEventListener('cache', (e) => {
-			const lock = JSON.parse(e.data);
-			if (this.listening) {
-				if (lock.request !== lastRequest) {
-					requestCounter = 1 - requestCounter;
-					lastRequest = lock.request;
-				}
-				lock.requestCounter = requestCounter;
-				cacheCb(lock);
-			}
+			this.onRequest(cacheCb, JSON.parse(e.data));
 		});
 		source.addEventListener('request', (e) => {
-			const request = JSON.parse(e.data);
-			if (this.listening) {
-				requestCb(request);
-			}
+			allowLiveCb(true);
+			this.onRequest(requestCb, JSON.parse(e.data));
 		});
 		this.source = source;
 		return source;
+	}
+
+	onRequest (cb, data) {
+		if (this.listening) {
+			cb(data);
+		}
+	}
+
+	onLock (cb, data) {
+		if (this.listening) {
+			if (data.request !== this.lastRequest) {
+				this.requestCounter = 1 - this.requestCounter;
+				this.lastRequest = data.request;
+			}
+			data.requestCounter = this.requestCounter;
+			cb(data);
+		}
+	}
+
+	onStorage (cb, data) {
+		if (this.listening) {
+			if (data.request !== this.lastRequest) {
+				this.requestCounter = 1 - this.requestCounter;
+				this.lastRequest = data.request;
+			}
+			data.requestCounter = this.requestCounter;
+			cb(data);
+		}
+	}
+
+	onCache (cb, data) {
+		if (this.listening) {
+			if (data.request !== this.lastRequest) {
+				this.requestCounter = 1 - this.requestCounter;
+				this.lastRequest = data.request;
+			}
+			data.requestCounter = this.requestCounter;
+			cb(data);
+		}
 	}
 
 	stopListening () {
