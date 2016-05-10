@@ -21,6 +21,7 @@
 
 namespace OCA\XRay\Controller;
 
+use OC\Security\CSP\ContentSecurityPolicy;
 use OCA\XRay\EventSource;
 use OCA\XRay\Queue\IQueue;
 use OCP\AppFramework\Http;
@@ -74,6 +75,10 @@ class PageController extends Controller {
 				'appId' => $this->appName
 			]
 		);
+
+		$csp = new ContentSecurityPolicy();
+		$csp->addAllowedConnectDomain('localhost:3003');
+		$response->setContentSecurityPolicy($csp);
 
 		return $response;
 	}
