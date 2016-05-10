@@ -153,12 +153,6 @@ export class App extends Component {
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
 					<Entry key={4}
 						   onClick={this.onClick.bind(this,'cache')}>Cache</Entry>
-
-					<Settings>
-						<h2>
-							Foo...
-						</h2>
-					</Settings>
 				</SideBar>
 
 				<ControlBar>

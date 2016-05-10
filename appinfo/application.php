@@ -85,9 +85,11 @@ class Application extends App {
 	}
 
 	public function registerSources() {
-		$transmitter = $this->getTransmitter();
-		$transmitter->startRequest();
+		if (!\OC::$CLI) {
+			$transmitter = $this->getTransmitter();
+			$transmitter->startRequest();
 
-		\OCP\Util::connectHook('OC_Filesystem', 'preSetup', $transmitter, 'transmitLocks');
+			\OCP\Util::connectHook('OC_Filesystem', 'preSetup', $transmitter, 'transmitLocks');
+		}
 	}
 }
