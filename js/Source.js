@@ -19,6 +19,8 @@ function sendItem (res, item) {
 	});
 }
 
+var port = process.env.PORT || 3003;
+
 http.createServer(function (req, res) {
 		litesocket(req, res, function () {
 			getHistory((history) => {
@@ -29,4 +31,6 @@ http.createServer(function (req, res) {
 			});
 		})
 	})
-	.listen(3003);
+	.listen(port);
+
+console.log('listening on port ' + port);
