@@ -22,6 +22,7 @@
 namespace OCA\XRay\Source;
 
 use OCA\XRay\Queue\IQueue;
+use OCP\Diagnostics\IQueryLogger;
 use OCP\IRequest;
 
 class Transmitter {
@@ -31,16 +32,20 @@ class Transmitter {
 	private $queue;
 	/** @var IRequest */
 	private $request;
+	/** @var IQueryLogger */
+	private $queryLogger;
 
 	const TYPE_LOCK = 'lock';
 	const TYPE_STORAGE = 'storage';
 	const TYPE_REQUEST = 'request';
 	const TYPE_CACHE = 'cache';
+	const TYPE_QUERY = 'query';
 
-	public function __construct(Injector $injector, IQueue $queue, IRequest $request) {
+	public function __construct(Injector $injector, IQueue $queue, IRequest $request, IQueryLogger $queryLogger) {
 		$this->injector = $injector;
 		$this->queue = $queue;
 		$this->request = $request;
+		$this->queryLogger = $queryLogger;
 	}
 
 	public function startRequest() {
@@ -57,6 +62,7 @@ class Transmitter {
 	}
 
 	public function transmitLocks() {
+		$this->queryLogger->getQueries();
 		$this->injector->injectStorageWrapper(function ($operation, $path, $type, $success, $stack) {
 			$requestId = $this->request->getId();
 			$this->queue->push([
@@ -96,5 +102,22 @@ class Transmitter {
 				]
 			]);
 		});
+	}
+
+	public function endRequest() {
+		$requestId = $this->request->getId();
+		foreach ($this->queryLogger->getQueries() as $query) {
+			$this->queue->push([
+				'type' => self::TYPE_QUERY,
+				'data' => [
+					'time' => $query->getStartTime(),
+					'sql' => $query->getSql(),
+					'parameters' => $query->getParams(),
+					'duration' => $query->getDuration(),
+					'stack' => $query->getStacktrace(),
+					'request' => $requestId
+				]
+			]);
+		}
 	}
 }

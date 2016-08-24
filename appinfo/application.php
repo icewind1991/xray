@@ -47,7 +47,7 @@ class Application extends App {
 		});
 
 		$container->registerService('Transmitter', function (SimpleContainer $c) use ($server) {
-			return new Transmitter($this->getInjector(), $this->getQueue(), $server->getRequest());
+			return new Transmitter($this->getInjector(), $this->getQueue(), $server->getRequest(), $server->getQueryLogger());
 		});
 
 		$container->registerService('PageController', function (SimpleContainer $c) use ($server) {
@@ -88,6 +88,8 @@ class Application extends App {
 		if (!\OC::$CLI) {
 			$transmitter = $this->getTransmitter();
 			$transmitter->startRequest();
+
+			register_shutdown_function([$transmitter, 'endRequest']);
 
 			\OCP\Util::connectHook('OC_Filesystem', 'preSetup', $transmitter, 'transmitLocks');
 		}

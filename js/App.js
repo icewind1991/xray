@@ -18,6 +18,7 @@ import Lock from './Pages/Lock';
 import Storage from './Pages/Storage';
 import Request from './Pages/Request';
 import Cache from './Pages/Cache';
+import Query from './Pages/Query';
 
 import style from '../css/app.less';
 
@@ -27,6 +28,7 @@ export class App extends Component {
 	storage = [];
 	cache = [];
 	requests = [];
+	query = [];
 	pause = false;
 
 	state = {
@@ -53,7 +55,8 @@ export class App extends Component {
 				path: '',
 				locks: [],
 				storage: [],
-				cache: []
+				cache: [],
+				query: []
 			};
 		}
 	}
@@ -64,7 +67,8 @@ export class App extends Component {
 				locks: this.locks,
 				requests: this.requests,
 				storage: this.storage,
-				cache: this.cache
+				cache: this.cache,
+				query: this.query
 			});
 		}
 	}, 100);
@@ -87,6 +91,11 @@ export class App extends Component {
 			this.cache.unshift(cacheOperation);
 			this.initRequest(cacheOperation.request);
 			this.requests[cacheOperation.request].cache.push(cacheOperation);
+			this.updateState();
+		}, queryOperation => {
+			this.query.unshift(queryOperation);
+			this.initRequest(queryOperation.request);
+			this.requests[queryOperation.request].query.push(queryOperation);
 			this.updateState();
 		}, allowLive => {this.setState({allowLive})});
 	}
@@ -135,6 +144,10 @@ export class App extends Component {
 				page = <Cache filter={this.state.filter}
 							  items={this.state.cache}/>;
 				break;
+			case 'query':
+				page = <Query filter={this.state.filter}
+							  items={this.state.query}/>;
+				break;
 			default:
 				page = <div>Unknown page</div>;
 		}
@@ -158,6 +171,8 @@ export class App extends Component {
 						   onClick={this.onClick.bind(this,'storage')}>Storage</Entry>
 					<Entry key={4}
 						   onClick={this.onClick.bind(this,'cache')}>Cache</Entry>
+					<Entry key={5}
+						   onClick={this.onClick.bind(this, 'query')}>Database</Entry>
 				</SideBar>
 
 				<ControlBar>

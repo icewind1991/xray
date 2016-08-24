@@ -1,5 +1,6 @@
 .lockTable {
   width: 100%;
+  table-layout:fixed;
 
   th {
     border-bottom: 1px solid #ddd;
@@ -13,7 +14,7 @@
   }
 
   .time {
-    width: 100px;
+    width: 110px;
   }
 
   .event {
@@ -28,6 +29,16 @@
     text-align: right;
     width: 100px;
     padding-right: 10px;
+  }
+
+  .query {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .duration {
+    width: 60px;
+    text-align: right;
   }
 
   .error {

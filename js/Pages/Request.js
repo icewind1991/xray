@@ -5,7 +5,7 @@ import {TablePage, Row} from './TablePage';
 import SingleRequest from './SingleRequest';
 
 class RequestRow extends Row {
-	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache'];
+	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache', 'Queries'];
 
 	closeDetails = ()=> {
 		this.props.toggleLive(true);
@@ -26,13 +26,14 @@ class RequestRow extends Row {
 			path: item.path,
 			locks: item.locks.length,
 			storage: item.storage.length,
-			cache: item.cache.length
+			cache: item.cache.length,
+			queries: item.query.length
 		}
 	}
 }
 
 export default class Request extends TablePage {
-	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache'];
+	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache', 'Queries'];
 
 	renderRow = (index, key) => {
 		return (

@@ -7,7 +7,7 @@ export default class DataProvider {
 	lastRequest = '';
 	requestCounter = 0;
 
-	listen (lockCb, storageCb, requestCb, cacheCb, allowLiveCb) {
+	listen (lockCb, storageCb, requestCb, cacheCb, queryCb, allowLiveCb) {
 		if (this.listening) {
 			return;
 		}
@@ -49,6 +49,9 @@ export default class DataProvider {
 			allowLiveCb(true);
 			this.onRequest(requestCb, JSON.parse(e.data));
 		});
+		source.addEventListener('query', (e) => {
+			this.onRequest(queryCb, JSON.parse(e.data));
+		});
 		this.source = source;
 		return source;
 	}
@@ -82,6 +85,17 @@ export default class DataProvider {
 	}
 
 	onCache (cb, data) {
+		if (this.listening) {
+			if (data.request !== this.lastRequest) {
+				this.requestCounter = 1 - this.requestCounter;
+				this.lastRequest = data.request;
+			}
+			data.requestCounter = this.requestCounter;
+			cb(data);
+		}
+	}
+
+	onQuery (cb, data) {
 		if (this.listening) {
 			if (data.request !== this.lastRequest) {
 				this.requestCounter = 1 - this.requestCounter;

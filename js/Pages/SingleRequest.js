@@ -3,6 +3,7 @@ import {Component} from 'react';
 import LockTable from './Lock';
 import StorageTable from './Storage';
 import CacheTable from './Cache';
+import QueryTable from './Query';
 
 import style from './Request.less';
 
@@ -26,6 +27,10 @@ export default class SingleRequest extends Component {
 		const cache = (request.cache.length > 0) ?
 			<CacheTable type="normal" filter="" items={request.cache}/> :
 			<p className={style.none}>No Cache operations</p>;
+
+		const query = (request.query.length > 0) ?
+			<QueryTable type="normal" filter="" items={request.query}/> :
+			<p className={style.none}>No database queries</p>;
 
 		delete request.params['v'];
 
@@ -66,6 +71,8 @@ export default class SingleRequest extends Component {
 			{storage}
 			<h2 className={style.category}>Cache</h2>
 			{cache}
+			<h2 className={style.category}>Database</h2>
+			{query}
 		</div>);
 	}
 }
