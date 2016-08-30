@@ -62,11 +62,11 @@ class StorageWrapper extends Wrapper {
 		$rootLength = strlen(\OC::$SERVERROOT);
 		return array_map(function ($trace) use ($rootLength) {
 			return [
-				'file' => substr($trace['file'], $rootLength),
-				'line' => $trace['line'],
-				'class' => $trace['class'],
+				'file' => isset($trace['file']) ? substr($trace['file'], $rootLength) : '',
+				'line' => isset($trace['line']) ? $trace['line'] : 0,
+				'class' => isset($trace['class']) ? $trace['class'] : '',
 				'function' => $trace['function'],
-				'type' => $trace['type']
+				'type' => isset($trace['type']) ? $trace['type'] : ''
 			];
 		}, $stack);
 	}

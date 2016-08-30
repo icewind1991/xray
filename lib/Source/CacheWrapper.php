@@ -45,11 +45,11 @@ class CacheWrapper extends \OC\Files\Cache\Wrapper\CacheWrapper {
 		$rootLength = strlen(\OC::$SERVERROOT);
 		return array_map(function ($trace) use ($rootLength) {
 			return [
-				'file' => substr($trace['file'], $rootLength),
-				'line' => $trace['line'],
-				'class' => $trace['class'],
+				'file' => isset($trace['file']) ? substr($trace['file'], $rootLength) : '',
+				'line' => isset($trace['line']) ? $trace['line'] : 0,
+				'class' => isset($trace['class']) ? $trace['class'] : '',
 				'function' => $trace['function'],
-				'type' => $trace['type']
+				'type' => isset($trace['type']) ? $trace['type'] : ''
 			];
 		}, $stack);
 	}
@@ -227,6 +227,7 @@ class CacheWrapper extends \OC\Files\Cache\Wrapper\CacheWrapper {
 		$this->emitCache('searchByMime', $mimetype);
 		return parent::searchByMime($mimetype);
 	}
+
 	/**
 	 * get the path of a file on this storage by it's id
 	 *
