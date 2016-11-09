@@ -22,15 +22,16 @@ function sendItem (res, item) {
 var port = process.env.PORT || 3003;
 
 http.createServer(function (req, res) {
-		litesocket(req, res, function () {
-			getHistory((history) => {
-				history.reverse().forEach(sendItem.bind(null, res));
-				sub.on("message", function (channel, message) {
-					sendItem(res, JSON.parse(message));
-				});
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Request-Method', '*');
+	litesocket(req, res, function () {
+		getHistory((history) => {
+			history.reverse().forEach(sendItem.bind(null, res));
+			sub.on("message", function (channel, message) {
+				sendItem(res, JSON.parse(message));
 			});
-		})
+		});
 	})
-	.listen(port);
+}).listen(port);
 
 console.log('listening on port ' + port);
