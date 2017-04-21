@@ -64,7 +64,7 @@ class PageController extends Controller {
 		);
 
 		$csp = new ContentSecurityPolicy();
-		$csp->addAllowedConnectDomain('localhost:3003');
+		$csp->addAllowedConnectDomain($this->request->getServerHost() . ':3003');
 		$response->setContentSecurityPolicy($csp);
 
 		return $response;

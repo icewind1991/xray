@@ -12,6 +12,6 @@
 		<logging/>
 	</types>
 	<dependencies>
-		<owncloud min-version="9.1" max-version="9.2"/>
+		<nextcloud min-version="11" max-version="12"/>
 	</dependencies>
 </info>

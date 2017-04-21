@@ -13,7 +13,7 @@ export default class DataProvider {
 		}
 		this.listening = true;
 
-		const source = new EventSource(`//localhost:3003`);
+		const source = new EventSource(`//${window.location.hostname}:3003`);
 		source.onerror = () => {
 			source.close();
 			allowLiveCb(false);
