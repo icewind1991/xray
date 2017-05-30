@@ -2,7 +2,7 @@
 <info>
 	<id>xray</id>
 	<name>XRay</name>
-	<description>See what is happening inside the ownCloud instance</description>
+	<description>See what is happening inside the Nextcloud instance</description>
 	<licence>AGPL</licence>
 	<author>Robin Appelman</author>
 	<version>0.1.1</version>
@@ -12,6 +12,6 @@
 		<logging/>
 	</types>
 	<dependencies>
-		<nextcloud min-version="11" max-version="12"/>
+		<nextcloud min-version="11" max-version="13"/>
 	</dependencies>
 </info>
