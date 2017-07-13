@@ -49,6 +49,11 @@ class Transmitter {
 	}
 
 	public function startRequest() {
+		try {
+			$params = $this->request->getParams();
+		} catch (\LogicException $e) {
+			$params = [];
+		}
 		$this->queue->push([
 			'type' => self::TYPE_REQUEST,
 			'data' => [
@@ -56,7 +61,7 @@ class Transmitter {
 				'time' => microtime(true),
 				'id' => $this->request->getId(),
 				'method' => $this->request->getMethod(),
-				'params' => $this->request->getParams()
+				'params' => $params
 			]
 		]);
 	}
