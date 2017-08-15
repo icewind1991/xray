@@ -22,6 +22,7 @@
 namespace OCA\XRay\Source;
 
 use OC\Files\Storage\Wrapper\Wrapper;
+use OCP\Files\Storage\IStorage;
 use OCP\Lock\ILockingProvider;
 use OCP\Lock\LockedException;
 
@@ -374,7 +375,7 @@ class StorageWrapper extends Wrapper {
 	 * @return array
 	 */
 	public function search($query) {
-		$this->emitStorage('search', $path);
+		$this->emitStorage('search', $query);
 		return parent::search($query);
 	}
 
@@ -439,23 +440,23 @@ class StorageWrapper extends Wrapper {
 	}
 
 	/**
-	 * @param \OCP\Files\Storage $sourceStorage
+	 * @param IStorage $sourceStorage
 	 * @param string $sourceInternalPath
 	 * @param string $targetInternalPath
 	 * @return bool
 	 */
-	public function copyFromStorage(\OCP\Files\Storage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
+	public function copyFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
 		$this->emitStorageTwoPaths('copyFromStorage', $sourceInternalPath, $targetInternalPath);
 		return parent::copyFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
 	}
 
 	/**
-	 * @param \OCP\Files\Storage $sourceStorage
+	 * @param IStorage $sourceStorage
 	 * @param string $sourceInternalPath
 	 * @param string $targetInternalPath
 	 * @return bool
 	 */
-	public function moveFromStorage(\OCP\Files\Storage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
+	public function moveFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
 		$this->emitStorageTwoPaths('moveFromStorage', $sourceInternalPath, $targetInternalPath);
 		return parent::moveFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
 	}
