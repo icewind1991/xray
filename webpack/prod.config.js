@@ -31,26 +31,42 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loaders: [strip.loader('debug'), 'babel-loader']
+				use: [strip.loader('debug'), 'babel-loader']
 			},
 			{test: /\.json$/, loader: 'json-loader'},
 			{
 				test: /\.css$/,
-				loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=2&sourceMap!autoprefixer?browsers=last 2 version')
+				use: ExtractTextPlugin.extract({
+					fallback: "style-loader",
+					use: [{
+						loader: 'css-loader',
+						options: {
+							modules: true,
+							sourceMap: true
+						}
+					}]
+				})
 			},
 			{
 				test: /\.less$/,
-				loader: ExtractTextPlugin.extract('style', 'css?modules&importLoaders=2&sourceMap!autoprefixer?browsers=last 2 version!less')
+				use: ExtractTextPlugin.extract({
+					fallback: "style-loader",
+					use: [
+						{
+							loader: 'css-loader',
+							options: {
+								modules: true,
+								sourceMap: true
+							}
+						},
+						'less-loader'
+					]
+				})
 			}
 		]
 	},
-	progress: true,
 	resolve: {
-		modulesDirectories: [
-			'src',
-			'node_modules'
-		],
-		extensions: ['', '.json', '.js']
+		extensions: ['.json', '.js']
 	},
 	plugins: [
 		new CleanPlugin([relativeAssetsPath]),
@@ -72,10 +88,6 @@ module.exports = {
 				NODE_ENV: JSON.stringify('production')
 			}
 		}),
-
-		// optimizations
-		new webpack.optimize.DedupePlugin(),
-		new webpack.optimize.OccurenceOrderPlugin(),
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				warnings: false
