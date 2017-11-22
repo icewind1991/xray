@@ -75,17 +75,17 @@ export class TablePage extends Component {
 
 	renderRow = (index, key) => {
 		return (
-			<tr/>
+			<tr key={key}/>
 		);
 	};
 
 	renderer = (items, ref) => {
-		const columns = this.columns.map(column => {
+		const columns = this.columns.map((column, i) => {
 			const className = column.toLowerCase();
 			if (style[className]) {
-				return <th className={style[className]}>{column}</th>
+				return <th key={i} className={style[className]}>{column}</th>
 			} else {
-				return <th>{column}</th>
+				return <th key={i}>{column}</th>
 			}
 		});
 		const classTable = style.lockTable +
@@ -116,7 +116,7 @@ export class TablePage extends Component {
 		}
 
 		if (this.props.type === 'normal') {
-			const rows = this.filteredRows.map((item, i)=>this.renderRow(i, i));
+			const rows = this.filteredRows.map((item, i) => this.renderRow(i, i));
 			return this.renderer(rows, this.ref);
 		} else {
 			return (

@@ -1,28 +1,19 @@
-var path = require('path');
-var webpack = require('webpack');
-var assetsPath = path.resolve(__dirname, '../build');
-var host = 'localhost';
-var port = parseInt(process.env.PORT) + 1 || 3001;
+// Webpack config for creating the production bundle.
+
+const path = require('path');
+const webpack = require("webpack");
+const assetsPath = path.resolve(__dirname, '../build');
 
 module.exports = {
-	ocRoot: 'http://localhost/owncloud/',
-	appId: 'xray',
-
-	webPackPort: port,
-	devtool: 'inline-source-map',
-	context: path.resolve(__dirname, '..'),
-	entry: {
-		'main': [
-			'webpack-dev-server/client?http://' + host + ':' + port,
-			'webpack/hot/only-dev-server',
-			'./js/index.js'
-		]
-	},
+	devtool: 'source-map',
+	entry: [
+		'react-hot-loader/patch',
+		'./js/index.js'
+	],
 	output: {
 		path: assetsPath,
-		filename: '[name].js',
-		chunkFilename: '[name]-[chunkhash].js',
-		publicPath: 'http://' + host + ':' + port + '/build/'
+		filename: 'main.js',
+		publicPath: '/'
 	},
 	module: {
 		loaders: [
@@ -34,37 +25,52 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loaders: ['react-hot', 'babel-loader']
+				use: [
+					'react-hot-loader/webpack',
+					'babel-loader'
+				]
 			},
-			{test: /\.json$/, loader: 'json-loader'},
+			{
+				test: /\.json$/,
+				loader: 'json-loader'
+			},
 			{
 				test: /\.css$/,
-				loader: 'style!css?modules&importLoaders=2&sourceMap&localIdentName=[local]___[hash:base64:5]!autoprefixer?browsers=last 2 version!'
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: true,
+							sourceMap: true
+						}
+					}
+				]
 			},
 			{
 				test: /\.less$/,
-				loader: 'style!css?modules&importLoaders=2&sourceMap&localIdentName=[local]___[hash:base64:5]!autoprefixer?browsers=last 2 version!less'
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: true,
+							localIdentName: '[name]__[local]--[hash:base64:5]',
+							sourceMap: true
+						}
+					},
+					'less-loader'
+				]
 			}
 		]
 	},
-	progress: true,
 	resolve: {
-		modulesDirectories: [
-			'src',
-			'node_modules'
-		],
-		extensions: ['', '.json', '.js']
+		extensions: ['.json', '.js']
+	},
+	devServer: {
+		contentBase: path.resolve(__dirname, './src')
 	},
 	plugins: [
-		// hot reload
-		new webpack.HotModuleReplacementPlugin(),
-		new webpack.IgnorePlugin(/\.json$/),
-		new webpack.NoErrorsPlugin(),
-		new webpack.DefinePlugin({
-			__CLIENT__: true,
-			__SERVER__: false,
-			__DEVELOPMENT__: true,
-			__DEVTOOLS__: true  // <-------- DISABLE redux-devtools HERE
-		})
+		new webpack.NamedModulesPlugin()
 	]
 };

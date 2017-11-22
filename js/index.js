@@ -1,14 +1,33 @@
 'use strict';
 
+import {App} from './App';
+import {AppContainer} from 'react-hot-loader';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDom from 'react-dom';
 
-import {App} from './App.js';
-import "babel-polyfill";
+// Enable React devtools
+window.React = React;
+
+const render = (Component) => {
+	ReactDom.render(
+		<AppContainer>
+			<Component/>
+		</AppContainer>,
+		document.getElementById('content')
+	);
+};
+
 
 // Enable React devtools
 window.React = React;
 
 $(document).ready(() => {
-	ReactDOM.render(<App />, document.getElementById('content'));
+	render(App);
+
+	// Hot Module Replacement API
+	if (module.hot) {
+		module.hot.accept('./App', () => {
+			render(App)
+		});
+	}
 });
