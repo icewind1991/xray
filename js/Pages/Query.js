@@ -5,7 +5,7 @@ import StackTrace from '../Components/StackTrace';
 
 import {TablePage, Row} from './TablePage';
 
-class QueryRow extends Row {
+export class QueryRow extends Row {
 	detailColumn = 'query';
 	columns = ['Time', 'Query', 'Duration'];
 

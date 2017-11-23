@@ -4,7 +4,7 @@ import {TablePage, Row} from './TablePage';
 
 import SingleRequest from './SingleRequest';
 
-class RequestRow extends Row {
+export class RequestRow extends Row {
 	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache', 'Queries'];
 
 	closeDetails = ()=> {

@@ -59,7 +59,7 @@ class StorageWrapper extends Wrapper {
 
 	private function getStack() {
 		$stack = debug_backtrace();
-		$stack = array_slice($stack, 2);
+		$stack = array_slice($stack, 3);
 		$rootLength = strlen(\OC::$SERVERROOT);
 		return array_map(function ($trace) use ($rootLength) {
 			return [
@@ -72,82 +72,42 @@ class StorageWrapper extends Wrapper {
 		}, $stack);
 	}
 
-	private function emitStorage($operation, $path) {
+	private function emitStorage($operation, $path, $duration) {
 		$callback = $this->storageCallback;
-		$callback($operation, $this->mountPoint . $path, $this->getStack());
+		$callback($operation, $this->mountPoint . $path, $this->getStack(), $duration);
 	}
 
+	private function wrapMethod($operation, $path, array $arguments) {
+		$start = microtime(true);
+		$result = call_user_func_array(['parent', $operation], $arguments);
+		$end = microtime(true);
+		$this->emitStorage($operation, $path, $end - $start);
+		return $result;
 
-	private function emitStorageTwoPaths($operation, $path1, $path2) {
-		$callback = $this->storageCallback;
-		$callback($operation, $this->mountPoint . $path1, $this->mountPoint . $path2, $this->getStack());
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.mkdir.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function mkdir($path) {
-		$this->emitStorage('mkdir', $path);
-		return parent::mkdir($path);
+		return $this->wrapMethod('mkdir', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.rmdir.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function rmdir($path) {
-		$this->emitStorage('rmdir', $path);
-		return parent::rmdir($path);
+		return $this->wrapMethod('rmdir', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.opendir.php
-	 *
-	 * @param string $path
-	 * @return resource
-	 */
 	public function opendir($path) {
-		$this->emitStorage('opendir', $path);
-		return parent::opendir($path);
+		return $this->wrapMethod('opendir', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.is_dir.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function is_dir($path) {
-		$this->emitStorage('is_dir', $path);
-		return parent::is_dir($path);
+		return $this->wrapMethod('is_dir', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.is_file.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function is_file($path) {
-		$this->emitStorage('is_file', $path);
-		return parent::is_file($path);
+		return $this->wrapMethod('is_file', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.stat.php
-	 * only the following keys are required in the result: size and mtime
-	 *
-	 * @param string $path
-	 * @return array
-	 */
 	public function stat($path) {
-		$this->emitStorage('stat', $path);
-		return parent::stat($path);
+		return $this->wrapMethod('stat', $path, [$path]);
 	}
 
 	/**
@@ -157,308 +117,111 @@ class StorageWrapper extends Wrapper {
 	 * @return bool
 	 */
 	public function filetype($path) {
-		$this->emitStorage('filetype', $path);
-		return parent::filetype($path);
+		return $this->wrapMethod('filetype', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.filesize.php
-	 * The result for filesize when called on a folder is required to be 0
-	 *
-	 * @param string $path
-	 * @return int
-	 */
 	public function filesize($path) {
-		$this->emitStorage('filesize', $path);
-		return parent::filesize($path);
+		return $this->wrapMethod('filesize', $path, [$path]);
 	}
 
-	/**
-	 * check if a file can be created in $path
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function isCreatable($path) {
-		$this->emitStorage('isCreatable', $path);
-		return parent::isCreatable($path);
+		return $this->wrapMethod('isCreatable', $path, [$path]);
 	}
 
-	/**
-	 * check if a file can be read
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function isReadable($path) {
-		$this->emitStorage('isReadable', $path);
-		return parent::isReadable($path);
+		return $this->wrapMethod('isReadable', $path, [$path]);
 	}
 
-	/**
-	 * check if a file can be written to
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function isUpdatable($path) {
-		$this->emitStorage('isUpdatable', $path);
-		return parent::isUpdatable($path);
+		return $this->wrapMethod('isUpdatable', $path, [$path]);
 	}
 
-	/**
-	 * check if a file can be deleted
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function isDeletable($path) {
-		$this->emitStorage('isDeletable', $path);
-		return parent::isDeletable($path);
+		return $this->wrapMethod('isDeletable', $path, [$path]);
 	}
 
-	/**
-	 * check if a file can be shared
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function isSharable($path) {
-		$this->emitStorage('isSharable', $path);
-		return parent::isSharable($path);
+		return $this->wrapMethod('isSharable', $path, [$path]);
 	}
 
-	/**
-	 * get the full permissions of a path.
-	 * Should return a combination of the PERMISSION_ constants defined in lib/public/constants.php
-	 *
-	 * @param string $path
-	 * @return int
-	 */
 	public function getPermissions($path) {
-		$this->emitStorage('getPermissions', $path);
-		return parent::getPermissions($path);
+		return $this->wrapMethod('getPermissions', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.file_exists.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function file_exists($path) {
-		$this->emitStorage('file_exists', $path);
-		return parent::file_exists($path);
+		return $this->wrapMethod('file_exists', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.filemtime.php
-	 *
-	 * @param string $path
-	 * @return int
-	 */
 	public function filemtime($path) {
-		$this->emitStorage('filemtime', $path);
-		return parent::filemtime($path);
+		return $this->wrapMethod('filemtime', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.file_get_contents.php
-	 *
-	 * @param string $path
-	 * @return string
-	 */
 	public function file_get_contents($path) {
-		$this->emitStorage('file_get_contents', $path);
-		return parent::file_get_contents($path);
+		return $this->wrapMethod('file_get_contents', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.file_put_contents.php
-	 *
-	 * @param string $path
-	 * @param string $data
-	 * @return bool
-	 */
 	public function file_put_contents($path, $data) {
-		$this->emitStorage('file_put_contents', $path);
-		return parent::file_put_contents($path, $data);
+		return $this->wrapMethod('file_put_contents', $path, [$path, $data]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.unlink.php
-	 *
-	 * @param string $path
-	 * @return bool
-	 */
 	public function unlink($path) {
-		$this->emitStorage('unlink', $path);
-		return parent::unlink($path);
+		return $this->wrapMethod('unlink', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.rename.php
-	 *
-	 * @param string $path1
-	 * @param string $path2
-	 * @return bool
-	 */
 	public function rename($path1, $path2) {
-		$this->emitStorageTwoPaths('rename', $path1, $path2);
-		return parent::rename($path1, $path2);
+		return $this->wrapMethod('rename', $path1, [$path1, $path2]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.copy.php
-	 *
-	 * @param string $path1
-	 * @param string $path2
-	 * @return bool
-	 */
 	public function copy($path1, $path2) {
-		$this->emitStorageTwoPaths('copy', $path1, $path2);
-		return parent::copy($path1, $path2);
+		return $this->wrapMethod('copy', $path1, [$path1, $path2]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.fopen.php
-	 *
-	 * @param string $path
-	 * @param string $mode
-	 * @return resource
-	 */
 	public function fopen($path, $mode) {
-		$this->emitStorage('fopen', $path);
-		return parent::fopen($path, $mode);
+		return $this->wrapMethod('fopen', $path, [$path, $mode]);
 	}
 
-	/**
-	 * get the mimetype for a file or folder
-	 * The mimetype for a folder is required to be "httpd/unix-directory"
-	 *
-	 * @param string $path
-	 * @return string
-	 */
 	public function getMimeType($path) {
-		$this->emitStorage('getMimeType', $path);
-		return parent::getMimeType($path);
+		return $this->wrapMethod('getMimeType', $path, [$path]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.hash.php
-	 *
-	 * @param string $type
-	 * @param string $path
-	 * @param bool $raw
-	 * @return string
-	 */
 	public function hash($type, $path, $raw = false) {
-		$this->emitStorage('hash', $path);
-		return parent::hash($type, $path, $raw);
+		return $this->wrapMethod('hash', $path, [$type, $path, $raw]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.free_space.php
-	 *
-	 * @param string $path
-	 * @return int
-	 */
 	public function free_space($path) {
-		$this->emitStorage('free_space', $path);
-		return parent::free_space($path);
+		return $this->wrapMethod('free_space', $path, [$path]);
 	}
 
-	/**
-	 * search for occurrences of $query in file names
-	 *
-	 * @param string $query
-	 * @return array
-	 */
 	public function search($query) {
-		$this->emitStorage('search', $query);
-		return parent::search($query);
+		return $this->wrapMethod('search', $query, [$query]);
 	}
 
-	/**
-	 * see http://php.net/manual/en/function.touch.php
-	 * If the backend does not support the operation, false should be returned
-	 *
-	 * @param string $path
-	 * @param int $mtime
-	 * @return bool
-	 */
 	public function touch($path, $mtime = null) {
-		$this->emitStorage('touch', $path);
-		return parent::touch($path, $mtime);
+		return $this->wrapMethod('touch', $path, [$path, $mtime]);
 	}
 
-	/**
-	 * get the path to a local version of the file.
-	 * The local version of the file can be temporary and doesn't have to be persistent across requests
-	 *
-	 * @param string $path
-	 * @return string
-	 */
 	public function getLocalFile($path) {
-		$this->emitStorage('getLocalFile', $path);
-		return parent::getLocalFile($path);
+		return $this->wrapMethod('getLocalFile', $path, [$path]);
 	}
 
-	/**
-	 * check if a file or folder has been updated since $time
-	 *
-	 * @param string $path
-	 * @param int $time
-	 * @return bool
-	 *
-	 * hasUpdated for folders should return at least true if a file inside the folder is add, removed or renamed.
-	 * returning true for other changes in the folder is optional
-	 */
 	public function hasUpdated($path, $time) {
-		$this->emitStorage('hasUpdated', $path);
-		return parent::hasUpdated($path, $time);
+		return $this->wrapMethod('hasUpdated', $path, [$path, $mtime]);
 	}
 
-	/**
-	 * get the ETag for a file or folder
-	 *
-	 * @param string $path
-	 * @return string
-	 */
 	public function getETag($path) {
-		$this->emitStorage('getETag', $path);
-		return parent::getETag($path);
+		return $this->wrapMethod('getETag', $path, [$path]);
 	}
 
-	/**
-	 * Returns true
-	 *
-	 * @return true
-	 */
 	public function test() {
 		return parent::test();
 	}
 
-	/**
-	 * @param IStorage $sourceStorage
-	 * @param string $sourceInternalPath
-	 * @param string $targetInternalPath
-	 * @return bool
-	 */
 	public function copyFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
-		$this->emitStorageTwoPaths('copyFromStorage', $sourceInternalPath, $targetInternalPath);
-		return parent::copyFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
+		return $this->wrapMethod('copyFromStorage', $sourceInternalPath, [$sourceStorage, $sourceInternalPath, $targetInternalPath]);
 	}
 
-	/**
-	 * @param IStorage $sourceStorage
-	 * @param string $sourceInternalPath
-	 * @param string $targetInternalPath
-	 * @return bool
-	 */
 	public function moveFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
-		$this->emitStorageTwoPaths('moveFromStorage', $sourceInternalPath, $targetInternalPath);
-		return parent::moveFromStorage($sourceStorage, $sourceInternalPath, $targetInternalPath);
+		return $this->wrapMethod('moveFromStorage', $sourceInternalPath, [$sourceStorage, $sourceInternalPath, $targetInternalPath]);
 	}
 
 	public function getCache($path = '', $storage = null) {
@@ -466,22 +229,10 @@ class StorageWrapper extends Wrapper {
 		return new CacheWrapper($parentCache, $this->mountPoint, $this->cacheCallback);
 	}
 
-	/**
-	 * @param string $path
-	 * @return array
-	 */
 	public function getMetaData($path) {
-		$this->emitStorage('getMetaData', $path);
-		return parent::getMetaData($path);
+		return $this->wrapMethod('getMetaData', $path, [$path]);
 	}
 
-
-	/**
-	 * @param string $path
-	 * @param int $type \OCP\Lock\ILockingProvider::LOCK_SHARED or \OCP\Lock\ILockingProvider::LOCK_EXCLUSIVE
-	 * @param \OCP\Lock\ILockingProvider $provider
-	 * @throws \OCP\Lock\LockedException
-	 */
 	public function acquireLock($path, $type, ILockingProvider $provider) {
 		$callback = $this->lockCallback;
 		try {
@@ -493,11 +244,6 @@ class StorageWrapper extends Wrapper {
 		}
 	}
 
-	/**
-	 * @param string $path
-	 * @param int $type \OCP\Lock\ILockingProvider::LOCK_SHARED or \OCP\Lock\ILockingProvider::LOCK_EXCLUSIVE
-	 * @param \OCP\Lock\ILockingProvider $provider
-	 */
 	public function releaseLock($path, $type, ILockingProvider $provider) {
 		$callback = $this->lockCallback;
 		try {
@@ -509,11 +255,6 @@ class StorageWrapper extends Wrapper {
 		}
 	}
 
-	/**
-	 * @param string $path
-	 * @param int $type \OCP\Lock\ILockingProvider::LOCK_SHARED or \OCP\Lock\ILockingProvider::LOCK_EXCLUSIVE
-	 * @param \OCP\Lock\ILockingProvider $provider
-	 */
 	public function changeLock($path, $type, ILockingProvider $provider) {
 		$callback = $this->lockCallback;
 		try {
@@ -524,5 +265,4 @@ class StorageWrapper extends Wrapper {
 			throw $e;
 		}
 	}
-
 }

@@ -8,7 +8,7 @@ import StackTrace from '../Components/StackTrace';
 
 import {TablePage, Row} from './TablePage';
 
-class LockRow extends Row {
+export class LockRow extends Row {
 	columns = ['Time', 'Event', 'Path', 'Type'];
 
 	getDetails (item) {

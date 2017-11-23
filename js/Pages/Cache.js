@@ -5,7 +5,7 @@ import StackTrace from '../Components/StackTrace';
 
 import {TablePage, Row} from './TablePage';
 
-class CacheRow extends Row {
+export class CacheRow extends Row {
 	columns = ['Time', 'Event', 'Path'];
 
 	getDetails (item) {

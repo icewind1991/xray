@@ -82,7 +82,7 @@ class Transmitter {
 					'request' => $requestId
 				]
 			]);
-		}, function ($operation, $path, $stack) {
+		}, function ($operation, $path, $stack, $duration) {
 			$requestId = $this->request->getId();
 			$this->queue->push([
 				'type' => self::TYPE_STORAGE,
@@ -91,7 +91,8 @@ class Transmitter {
 					'operation' => $operation,
 					'path' => $path,
 					'stack' => $stack,
-					'request' => $requestId
+					'request' => $requestId,
+					'duration' => $duration
 				]
 			]);
 		}, function ($operation, $path, $stack) {
