@@ -21,6 +21,7 @@
 
 namespace OCA\XRay\Source;
 
+use OCA\XRay\Queue\DatabaseLog;
 use OCA\XRay\Queue\IQueue;
 use OCP\Diagnostics\IQueryLogger;
 use OCP\IRequest;

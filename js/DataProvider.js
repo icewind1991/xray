@@ -57,6 +57,7 @@ export default class DataProvider {
 	}
 
 	onRequest (cb, data) {
+		console.log(JSON.stringify(data).length);
 		if (this.listening) {
 			cb(data);
 		}

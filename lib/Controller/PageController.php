@@ -23,6 +23,7 @@ namespace OCA\XRay\Controller;
 
 use OC\Security\CSP\ContentSecurityPolicy;
 use OCA\XRay\EventSource;
+use OCA\XRay\Queue\DatabaseLog;
 use OCA\XRay\Queue\IQueue;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -32,21 +33,21 @@ use OCP\IRequest;
 class PageController extends Controller {
 	/** @var  IQueue */
 	private $queue;
+	/** @var DatabaseLog */
+	private $log;
 
-	/**
-	 * @param string $AppName
-	 * @param IRequest $request
-	 * @param IQueue $queue
-	 */
-	public function __construct($AppName, IRequest $request, IQueue $queue) {
+	public function __construct($AppName, IRequest $request, IQueue $queue, DatabaseLog $log) {
 		parent::__construct($AppName, $request);
 		$this->queue = $queue;
+		$this->log = $log;
 	}
 
-	public function history() {
-		$history = $this->queue->retrieveHistory();
-
-		return $history;
+	/**
+	 * @param int $before
+	 * @return array
+	 */
+	public function history($before = 0) {
+		return $this->log->getHistory($before);
 	}
 
 	/**

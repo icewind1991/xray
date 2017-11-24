@@ -36,7 +36,7 @@ class RedisQueue implements IQueue {
 	 * @param string $channel
 	 * @param int $size
 	 */
-	public function __construct(\Redis $redis, $channel, $size = 256) {
+	public function __construct(\Redis $redis, $channel, $size = 1024) {
 		$this->redis = $redis;
 		$this->channel = $channel;
 		$this->size = $size;

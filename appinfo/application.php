@@ -21,8 +21,11 @@
 
 namespace OCA\XRay\AppInfo;
 
-use OCA\XRay\Controller\PageController;
+use OC\AppFramework\Utility\TimeFactory;
+use OCA\XRay\Queue\DatabaseLog;
 use OCA\XRay\Queue\IQueue;
+use OCA\XRay\Queue\MultiPush;
+use OCA\XRay\Queue\NullQueue;
 use OCA\XRay\Queue\RedisQueue;
 use OCA\XRay\Source\Injector;
 use OCA\XRay\Source\Transmitter;
@@ -30,33 +33,35 @@ use OCP\AppFramework\App;
 use OC\AppFramework\Utility\SimpleContainer;
 
 class Application extends App {
-	public function __construct(array $urlParams = array()) {
+	public function __construct(array $urlParams = []) {
 		parent::__construct('xray', $urlParams);
 
 		$container = $this->getContainer();
 		/** @var \OC\Server $server */
 		$server = $container->getServer();
 
-		$container->registerService('Injector', function (SimpleContainer $c) use ($server) {
+		$container->registerService(Injector::class, function (SimpleContainer $c) use ($server) {
 			return new Injector($server);
 		});
 
-		$container->registerService('Queue', function (SimpleContainer $c) use ($server) {
-			$redis = $server->getGetRedisFactory()->getInstance();
-			return new RedisQueue($redis, 'xray', 512);
+		$container->registerService(IQueue::class, function (SimpleContainer $c) use ($server) {
+			$redisFactory = $server->getGetRedisFactory();
+			if ($redisFactory->isAvailable()) {
+				return new RedisQueue($redisFactory->getInstance(), 'xray', 512);
+			} else {
+				return new NullQueue();
+			}
 		});
 
-		$container->registerService('Transmitter', function (SimpleContainer $c) use ($server) {
-			return new Transmitter($this->getInjector(), $this->getQueue(), $server->getRequest(), $server->getQueryLogger());
+		$container->registerService(Transmitter::class, function (SimpleContainer $c) use ($server) {
+			return new Transmitter($this->getInjector(), new MultiPush([
+				$this->getQueue(),
+				$this->getLog()
+			]), $server->getRequest(), $server->getQueryLogger());
 		});
 
-		$container->registerService('PageController', function (SimpleContainer $c) use ($server) {
-			/** @var \OC\Server $server */
-			return new PageController(
-				$c->query('AppName'),
-				$server->getRequest(),
-				$this->getQueue()
-			);
+		$container->registerService(DatabaseLog::class, function (SimpleContainer $c) use ($server) {
+			return new DatabaseLog($server->getDatabaseConnection(), $server->getRequest(), new TimeFactory());
 		});
 	}
 
@@ -65,7 +70,7 @@ class Application extends App {
 	 */
 	private function getInjector() {
 		$container = $this->getContainer();
-		return $container->query('Injector');
+		return $container->query(Injector::class);
 	}
 
 	/**
@@ -73,7 +78,7 @@ class Application extends App {
 	 */
 	private function getQueue() {
 		$container = $this->getContainer();
-		return $container->query('Queue');
+		return $container->query(IQueue::class);
 	}
 
 	/**
@@ -81,7 +86,15 @@ class Application extends App {
 	 */
 	private function getTransmitter() {
 		$container = $this->getContainer();
-		return $container->query('Transmitter');
+		return $container->query(Transmitter::class);
+	}
+
+	/**
+	 * @return DatabaseLog
+	 */
+	private function getLog() {
+		$container = $this->getContainer();
+		return $container->query(DatabaseLog::class);
 	}
 
 	public function registerSources() {
