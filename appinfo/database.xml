@@ -35,6 +35,22 @@
 				<notnull>true</notnull>
 				<length>4</length>
 			</field>
+			<index>
+				<name>request_id_idx</name>
+				<unique>false</unique>
+				<field>
+					<name>request_id</name>
+					<sorting>ascending</sorting>
+				</field>
+			</index>
+			<index>
+				<name>timestamp_idx</name>
+				<unique>false</unique>
+				<field>
+					<name>timestamp</name>
+					<sorting>descending</sorting>
+				</field>
+			</index>
 		</declaration>
 	</table>
 </database>

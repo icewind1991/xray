@@ -52,17 +52,83 @@ class DatabaseLog {
 		$query->execute();
 	}
 
-	public function getHistory($before = 0, $count = 500) {
+	/**
+	 * @param string $requestId
+	 * @return integer[] [$min, $max]
+	 */
+	private function getRequestIds($requestId) {
+		$query = $this->connection->getQueryBuilder();
+
+		$idCol = $query->getColumnName('id');
+
+		$query->select($query->createFunction("MIN($idCol)"), $query->createFunction("MAX($idCol)"))
+			->from('xray_log')
+			->where($query->expr()->eq('request_id', $query->createNamedParameter($requestId)));
+
+		$result = $query->execute();
+
+		return $result->fetch(\PDO::FETCH_NUM);
+	}
+
+	/**
+	 * @param string $beforeRequest
+	 * @param int $requestCount
+	 * @return integer[] [$min, $max]
+	 */
+	private function getItemIds($beforeRequest, $requestCount = 20) {
+		list($beforeId) = $this->getRequestIds($beforeRequest);
+
+		$query = $this->connection->getQueryBuilder();
+
+		$idCol = $query->getColumnName('id');
+
+		$query->select($query->createFunction("MIN($idCol)"))
+			->from('xray_log')
+			->where($query->expr()->lt('id', $query->createNamedParameter($beforeId, \PDO::PARAM_INT)))
+			->groupBy('request_id')
+			->orderBy($query->createFunction("MIN($idCol)"), 'DESC')
+			->setMaxResults($requestCount);
+
+		$result = $query->execute();
+		$rows = $result->fetchAll(\PDO::FETCH_NUM);
+
+		$minId = $rows[count($rows) - 1][0];
+
+		return [$minId, $beforeId - 1];
+	}
+
+	private function getLastRequest() {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->select('request_id')
+			->from('xray_log')
+			->orderBy('id', 'DESC')
+			->setMaxResults(1);
+
+		$result = $query->execute();
+
+		return $result->fetchColumn();
+	}
+
+	/**
+	 * @param string $before
+	 * @param int $count
+	 * @return array
+	 */
+	public function getHistory($before = '', $count = 20) {
+		if (!$before) {
+			$before = $this->getLastRequest();
+		}
+
+		list($minId, $maxId) = $this->getItemIds($before, $count);
+
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('data')
 			->from('xray_log')
 			->orderBy('id', 'DESC')
-			->setMaxResults($count);
-
-		if ($before) {
-			$query->where($query->expr()->lt('id', $query->createNamedParameter($before, IQueryBuilder::PARAM_INT)));
-		}
+			->where($query->expr()->lte('id', $query->createNamedParameter($maxId, \PDO::PARAM_INT)))
+			->andWhere($query->expr()->gte('id', $query->createNamedParameter($minId, \PDO::PARAM_INT)));
 
 		$result = $query->execute();
 
