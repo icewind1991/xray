@@ -1,4 +1,4 @@
-import Timestamp from 'react-time';
+import {RelativeTime} from '../Components/RelativeTime';
 
 import {TablePage, Row} from './TablePage';
 
@@ -7,10 +7,8 @@ export class RequestRow extends Row {
 
 	getBody (item) {
 		return {
-			time: <Timestamp
-				value={item.time * 1000}
-				relative
-				titleFormat="HH:mm:ss.SSS"/>,
+			time: <RelativeTime
+				time={item.time * 1000}/>,
 			path: item.path,
 			locks: item.lock.length,
 			storage: item.storage.length,

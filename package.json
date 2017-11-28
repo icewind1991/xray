@@ -45,7 +45,6 @@
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
     "react-list": "^0.8.8",
-    "react-time": "^4.3.0",
     "redis": "^2.8.0"
   }
 }

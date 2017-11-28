@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Timestamp from 'react-time';
 
 import LockType from './LockType';
 

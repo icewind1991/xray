@@ -1,6 +1,6 @@
 import {Component} from 'react';
 
-import Timestamp from 'react-time';
+import {RelativeTime} from '../Components/RelativeTime';
 import LockType from '../Components/LockType';
 import EventType from '../Components/LockEventType';
 import LockState from '../Components/LockState';
@@ -20,10 +20,8 @@ export class LockRow extends Row {
 
 	getBody(item) {
 		return {
-			time: <Timestamp
-				value={item.time * 1000}
-				relative
-				titleFormat="HH:mm:ss.SSS"/>,
+			time: <RelativeTime
+				time={item.time * 1000}/>,
 			event: <EventType type={item.operation}/>,
 			path: item.path,
 			type: <LockType type={item.type}/>

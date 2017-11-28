@@ -1,6 +1,6 @@
 import {Component} from 'react';
 
-import Timestamp from 'react-time';
+import {RelativeTime} from '../Components/RelativeTime';
 import StackTrace from '../Components/StackTrace';
 
 import {TablePage, Row} from './TablePage';
@@ -19,10 +19,8 @@ export class QueryRow extends Row {
 	getBody (item) {
 		const duration = (item.duration * 1000).toFixed(2);
 		return {
-			time: <Timestamp
-				value={item.time * 1000}
-				relative
-				titleFormat="HH:mm:ss.SSS"/>,
+			time: <RelativeTime
+				time={item.time * 1000}/>,
 			query: item.sql,
 			duration: duration + 'ms'
 		}

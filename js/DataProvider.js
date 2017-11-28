@@ -22,8 +22,6 @@ export default class DataProvider {
 					const request = requests.get(item.data.request);
 					if (request) {
 						request[item.type].push(item.data);
-					} else {
-						console.log(item.data.request);
 					}
 				}
 			});
