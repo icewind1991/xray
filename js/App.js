@@ -21,16 +21,15 @@ import Cache from './Pages/Cache';
 import Query from './Pages/Query';
 
 import style from '../css/app.less';
+import SingleRequest from "./Pages/SingleRequest";
 
 export class App extends Component {
 	loading = false;
 
 	state = {
-		live: false,
 		filter: '',
-		page: 'request', // lazy mans routing
 		requests: [],
-		allowLive: false
+		openRequest: null
 	};
 
 	constructor () {
@@ -54,6 +53,26 @@ export class App extends Component {
 
 	componentDidMount () {
 		this.loadMore();
+		document.addEventListener('paste', this.handlePaste)
+	}
+
+	handlePaste = (event) => {
+		let data = event.clipboardData.getData('Text');
+		if (!data) {
+			data = event.clipboardData.getData('text/plain');
+		}
+		data = data.trim();
+		if (data.indexOf('{') !== -1 && data.indexOf('}')) {
+			this.loadRequestData(data);
+		}
+	};
+
+	loadRequestData (rawData) {
+		rawData = rawData.replace(/\n/g, '');
+		const data = JSON.parse(rawData);
+		if (data.id && data.path) {
+			this.openRequest(data);
+		}
 	}
 
 	onClick (page, e) {
@@ -87,6 +106,14 @@ export class App extends Component {
 		});
 	};
 
+	openRequest = (item) => {
+		this.setState({openRequest: item});
+	};
+
+	closeRequest = () => {
+		this.setState({openRequest: null});
+	};
+
 	render () {
 		return (
 			<AppContainer appId="xray">
@@ -99,9 +126,14 @@ export class App extends Component {
 				</ControlBar>
 
 				<Content>
-					<Request filter={this.state.filter}
-							 loadExtra={this.loadMore}
-							 items={this.state.requests}/>
+					{this.state.openRequest ?
+						<SingleRequest request={this.state.openRequest}
+									   close={this.closeRequest}/> :
+						<Request filter={this.state.filter}
+								 loadExtra={this.loadMore}
+								 onOpenRequest={this.openRequest}
+								 items={this.state.requests}/>
+					}
 				</Content>
 			</AppContainer>
 		);

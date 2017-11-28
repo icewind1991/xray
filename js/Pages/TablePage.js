@@ -12,8 +12,8 @@ export class Row extends Component {
 
 	onClick = () => {
 		const showDetail = !this.state.showDetail;
-		if (showDetail && this.getOverlay) {
-			this.props.setOverlay(this.getOverlay(this.props.item));
+		if (showDetail && this.props.onClickItem) {
+			this.props.onClickItem(this.props.item);
 		} else {
 			this.setState({showDetail});
 		}
@@ -65,14 +65,6 @@ export class Row extends Component {
 export class TablePage extends Component {
 	filteredRows = [];
 
-	state = {
-		overlay: null
-	};
-
-	setOverlay = (overlay) => {
-		this.setState({overlay});
-	};
-
 	renderRow = (index, key) => {
 		return (
 			<tr key={key}/>
@@ -104,9 +96,6 @@ export class TablePage extends Component {
 	};
 
 	render () {
-		if (this.state.overlay) {
-			return this.state.overlay;
-		}
 		if (this.props.filter) {
 			this.filteredRows = this.props.items.filter(item => {
 				return item.path.indexOf(this.props.filter) !== -1;

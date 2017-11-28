@@ -2,18 +2,8 @@ import Timestamp from 'react-time';
 
 import {TablePage, Row} from './TablePage';
 
-import SingleRequest from './SingleRequest';
-
 export class RequestRow extends Row {
 	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache', 'Queries'];
-
-	closeDetails = () => {
-		this.props.setOverlay(null);
-	};
-
-	getOverlay (item) {
-		return (<SingleRequest close={this.closeDetails} request={item}/>);
-	}
 
 	getBody (item) {
 		return {
@@ -39,6 +29,7 @@ export default class Request extends TablePage {
 		}
 		return (
 			<RequestRow key={key} rowKey={key}
+						onClickItem={this.props.onOpenRequest}
 						locks={this.props.items}
 						setOverlay={this.setOverlay}
 						toggleLive={this.props.toggleLive}
