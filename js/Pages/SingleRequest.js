@@ -16,8 +16,8 @@ export default class SingleRequest extends Component {
 	render () {
 		const request = this.props.request;
 
-		const locks = (request.locks.length > 0) ?
-			<LockTable type="normal" filter="" items={request.locks}/> :
+		const locks = (request.lock.length > 0) ?
+			<LockTable type="normal" filter="" items={request.lock}/> :
 			<p className={style.none}>No Locks</p>;
 
 		const storage = (request.storage.length > 0) ?

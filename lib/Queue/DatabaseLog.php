@@ -133,6 +133,7 @@ class DatabaseLog {
 		$result = $query->execute();
 
 		$items = $result->fetchAll(\PDO::FETCH_COLUMN);
+//		return [];
 		return array_map(function ($item) {
 			return json_decode($item, true);
 		}, $items);

@@ -43,10 +43,10 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @param int $before
+	 * @param string $before
 	 * @return array
 	 */
-	public function history($before = 0) {
+	public function history($before = '') {
 		return $this->log->getHistory($before);
 	}
 

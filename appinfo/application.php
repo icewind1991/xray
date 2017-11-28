@@ -99,6 +99,11 @@ class Application extends App {
 
 	public function registerSources() {
 		if (!\OC::$CLI) {
+			$request = $this->getContainer()->getServer()->getRequest();
+			// dont pollute the logs with our own requests
+			if (strpos($request->getRequestUri(), 'apps/xray/') !== false) {
+				return;
+			}
 			$transmitter = $this->getTransmitter();
 			$transmitter->startRequest();
 
