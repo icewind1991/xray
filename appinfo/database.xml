@@ -21,7 +21,7 @@
 				<name>data</name>
 				<type>text</type>
 				<notnull>true</notnull>
-				<length>10240</length>
+				<length>20480</length>
 			</field>
 			<field>
 				<name>request_id</name>
