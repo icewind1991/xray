@@ -1,4 +1,5 @@
 import {Component} from 'react';
+import clipboard from 'clipboard-polyfill';
 
 import LockTable from './Lock';
 import StorageTable from './Storage';
@@ -11,6 +12,11 @@ export default class SingleRequest extends Component {
 
 	onClick = (event) => {
 		event.stopPropagation();
+	};
+
+	exportRequest = () => {
+		clipboard.writeText(JSON.stringify(this.props.request));
+		OC.Notification.showTemporary(t('core', 'Exported to clipboard'));
 	};
 
 	render () {
@@ -60,9 +66,14 @@ export default class SingleRequest extends Component {
 			<p className={style.none}>No Parameters</p>;
 
 		return (<div onClick={this.onClick} className={style.requestDetails}>
-			<button className={style.close} onClick={this.props.close}>Close
+			<button className={style.close} onClick={this.props.close}>
+				Close
+			</button>
+			<button className={style.close} onClick={this.exportRequest}>
+				Export
 			</button>
 			<h1 className={style.title}>{request.method} {request.path}</h1>
+			<h2 className={style.title}>Request id: {request.id}</h2>
 			<h2 className={style.category}>Parameters</h2>
 			{params}
 			<h2 className={style.category}>Locks</h2>

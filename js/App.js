@@ -90,11 +90,13 @@ export class App extends Component {
 	render () {
 		return (
 			<AppContainer appId="xray">
-				<SideBar withIcon={true}>
-					<input className={style.filter} type="text"
-						   placeholder="Filter path..."
-						   onChange={this.onFilterChange.bind(this)}/>
-				</SideBar>
+				<ControlBar>
+					<div className={style.filterWrapper}>
+						<input className={style.filter} type="text"
+							   placeholder="Filter path..."
+							   onChange={this.onFilterChange.bind(this)}/>
+					</div>
+				</ControlBar>
 
 				<Content>
 					<Request filter={this.state.filter}

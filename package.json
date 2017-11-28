@@ -37,6 +37,7 @@
     "babel-plugin-typecheck": "^3.9.0",
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.1",
+    "clipboard-polyfill": "^2.3.0",
     "event-source": "^0.1.1",
     "litesocket": "^0.9.3",
     "moment": "^2.19.2",
