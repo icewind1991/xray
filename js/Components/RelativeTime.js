@@ -9,9 +9,9 @@ export class RelativeTime extends Component {
 		let timeout = 0;
 
 		if (diff < 60) {
-			timeout = 1;
+			timeout = 10;
 		} else if (diff < 3600) {
-			timeout = 60;
+			timeout = 600;
 		}
 
 		setTimeout(() => {

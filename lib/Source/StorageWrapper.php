@@ -59,7 +59,7 @@ class StorageWrapper extends Wrapper {
 
 	private function getStack() {
 		$stack = debug_backtrace();
-		$stack = array_slice($stack, 3);
+		$stack = array_slice($stack, 4);
 		$rootLength = strlen(\OC::$SERVERROOT);
 		return array_map(function ($trace) use ($rootLength) {
 			return [

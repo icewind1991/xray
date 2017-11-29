@@ -41,7 +41,7 @@ class CacheWrapper extends \OC\Files\Cache\Wrapper\CacheWrapper {
 
 	private function getStack() {
 		$stack = debug_backtrace();
-		$stack = array_slice($stack, 2);
+		$stack = array_slice($stack, 3);
 		$rootLength = strlen(\OC::$SERVERROOT);
 		return array_map(function ($trace) use ($rootLength) {
 			return [

@@ -114,6 +114,9 @@ class Transmitter {
 	public function endRequest() {
 		$requestId = $this->request->getId();
 		foreach ($this->queryLogger->getQueries() as $query) {
+			if (strpos($query->getSql(), 'xray_log') !== false) {
+				continue;
+			}
 			$this->queue->push([
 				'type' => self::TYPE_QUERY,
 				'data' => [
