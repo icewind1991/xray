@@ -2,7 +2,8 @@
 <info>
 	<id>xray</id>
 	<name>XRay</name>
-	<description>See what is happening inside the Nextcloud instance</description>
+	<description>See what is happening inside the Nextcloud instance
+	</description>
 	<licence>AGPL</licence>
 	<author>Robin Appelman</author>
 	<version>0.2.0</version>
@@ -11,6 +12,11 @@
 	<types>
 		<logging/>
 	</types>
+
+	<background-jobs>
+		<job>OCA\XRay\Jobs\CleanupGroups</job>
+	</background-jobs>
+
 	<dependencies>
 		<nextcloud min-version="11" max-version="13"/>
 	</dependencies>

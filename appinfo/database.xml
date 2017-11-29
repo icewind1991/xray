@@ -30,6 +30,12 @@
 				<length>64</length>
 			</field>
 			<field>
+				<name>request_numeric_id</name>
+				<type>integer</type>
+				<notnull>true</notnull>
+				<length>4</length>
+			</field>
+			<field>
 				<name>timestamp</name>
 				<type>integer</type>
 				<notnull>true</notnull>
@@ -44,7 +50,56 @@
 				</field>
 			</index>
 			<index>
+				<name>request_numeric_id_idx</name>
+				<unique>false</unique>
+				<field>
+					<name>request_id</name>
+					<sorting>ascending</sorting>
+				</field>
+			</index>
+			<index>
 				<name>timestamp_idx</name>
+				<unique>false</unique>
+				<field>
+					<name>timestamp</name>
+					<sorting>descending</sorting>
+				</field>
+			</index>
+		</declaration>
+	</table>
+	<table>
+		<name>*dbprefix*xray_requests</name>
+		<declaration>
+			<field>
+				<name>id</name>
+				<type>integer</type>
+				<default>0</default>
+				<notnull>true</notnull>
+				<autoincrement>1</autoincrement>
+				<length>4</length>
+			</field>
+			<field>
+				<name>request_id</name>
+				<type>text</type>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
+			<field>
+				<name>timestamp</name>
+				<type>integer</type>
+				<notnull>true</notnull>
+				<length>4</length>
+			</field>
+			<index>
+				<name>req_request_id_idx</name>
+				<unique>true</unique>
+				<field>
+					<name>request_id</name>
+					<sorting>ascending</sorting>
+				</field>
+			</index>
+			<index>
+				<name>req_timestamp_idx</name>
 				<unique>false</unique>
 				<field>
 					<name>timestamp</name>

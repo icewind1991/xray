@@ -33,6 +33,8 @@ class DatabaseLog {
 	private $request;
 	/** @var ITimeFactory */
 	private $timeFactory;
+	private $registeredRequest = false;
+	private $requestNumericId;
 
 	public function __construct(IDBConnection $connection, IRequest $request, ITimeFactory $timeFactory) {
 		$this->connection = $connection;
@@ -43,71 +45,52 @@ class DatabaseLog {
 	public function push($item) {
 		$query = $this->connection->getQueryBuilder();
 
+		if (!$this->registeredRequest) {
+			$this->registeredRequest = true;
+			$this->registerRequest();
+		}
 		$query->insert('xray_log')
 			->values([
 				'data' => $query->createNamedParameter(json_encode($item)),
 				'request_id' => $query->createNamedParameter($this->request->getId()),
+				'request_numeric_id' => $query->createNamedParameter($this->requestNumericId, IQueryBuilder::PARAM_INT),
 				'timestamp' => $query->createNamedParameter($this->timeFactory->getTime(), IQueryBuilder::PARAM_INT)
 			]);
 		$query->execute();
 	}
 
-	/**
-	 * @param string $requestId
-	 * @return integer[] [$min, $max]
-	 */
-	private function getRequestIds($requestId) {
+	private function registerRequest() {
 		$query = $this->connection->getQueryBuilder();
 
-		$idCol = $query->getColumnName('id');
+		$query->insert('xray_requests')
+			->values([
+				'request_id' => $query->createNamedParameter($this->request->getId()),
+				'timestamp' => $query->createNamedParameter($this->timeFactory->getTime(), IQueryBuilder::PARAM_INT)
+			]);
+		$query->execute();
 
-		$query->select($query->createFunction("MIN($idCol)"), $query->createFunction("MAX($idCol)"))
-			->from('xray_log')
-			->where($query->expr()->eq('request_id', $query->createNamedParameter($requestId)));
-
-		$result = $query->execute();
-
-		return $result->fetch(\PDO::FETCH_NUM);
+		$this->requestNumericId = $this->connection->lastInsertId('*PREFIX*xray_requests');
 	}
 
 	/**
-	 * @param string $beforeRequest
-	 * @param int $requestCount
-	 * @return integer[] [$min, $max]
+	 * @param string $id
+	 * @return int
 	 */
-	private function getItemIds($beforeRequest, $requestCount = 20) {
-		list($beforeId) = $this->getRequestIds($beforeRequest);
-
+	private function getRequestNumericId($id) {
 		$query = $this->connection->getQueryBuilder();
 
-		$idCol = $query->getColumnName('id');
-
-		$query->select($query->createFunction("MIN($idCol)"))
-			->from('xray_log')
-			->where($query->expr()->lt('id', $query->createNamedParameter($beforeId, \PDO::PARAM_INT)))
-			->groupBy('request_id')
-			->orderBy($query->createFunction("MIN($idCol)"), 'DESC')
-			->setMaxResults($requestCount);
-
-		$result = $query->execute();
-		$rows = $result->fetchAll(\PDO::FETCH_NUM);
-
-		$minId = $rows[count($rows) - 1][0];
-
-		return [$minId, $beforeId - 1];
-	}
-
-	private function getLastRequest() {
-		$query = $this->connection->getQueryBuilder();
-
-		$query->select('request_id')
-			->from('xray_log')
+		$query->select('id')
+			->from('xray_requests')
 			->orderBy('id', 'DESC')
 			->setMaxResults(1);
 
+		if ($id) {
+			$query->where($query->expr()->eq('request_id', $query->createNamedParameter($id)));
+		}
+
 		$result = $query->execute();
 
-		return $result->fetchColumn();
+		return (int)$result->fetchColumn();
 	}
 
 	/**
@@ -116,26 +99,40 @@ class DatabaseLog {
 	 * @return array
 	 */
 	public function getHistory($before = '', $count = 20) {
-		if (!$before) {
-			$before = $this->getLastRequest();
-		}
-
-		list($minId, $maxId) = $this->getItemIds($before, $count);
+		$beforeNumericId = $this->getRequestNumericId($before);
 
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('data')
 			->from('xray_log')
 			->orderBy('id', 'DESC')
-			->where($query->expr()->lte('id', $query->createNamedParameter($maxId, \PDO::PARAM_INT)))
-			->andWhere($query->expr()->gte('id', $query->createNamedParameter($minId, \PDO::PARAM_INT)));
+			->where($query->expr()->lt('request_numeric_id', $query->createNamedParameter($beforeNumericId, \PDO::PARAM_INT)))
+			->andWhere($query->expr()->gte('request_numeric_id', $query->createNamedParameter($beforeNumericId - $count, \PDO::PARAM_INT)));
 
 		$result = $query->execute();
 
 		$items = $result->fetchAll(\PDO::FETCH_COLUMN);
-//		return [];
 		return array_map(function ($item) {
 			return json_decode($item, true);
 		}, $items);
+	}
+
+	public function cleanup() {
+		$query = $this->connection->getQueryBuilder();
+
+		$cutOff = $this->timeFactory->getTime() - 3600;
+
+		$query->delete('xray_log')
+			->where($query->expr()->lt('timestamp', $query->createNamedParameter($cutOff, \PDO::PARAM_INT)));
+		$query->execute()->closeCursor();
+
+
+		$query = $this->connection->getQueryBuilder();
+
+		$cutOff = $this->timeFactory->getTime() - 3600;
+
+		$query->delete('xray_requests')
+			->where($query->expr()->lt('timestamp', $query->createNamedParameter($cutOff, \PDO::PARAM_INT)));
+		$query->execute();
 	}
 }

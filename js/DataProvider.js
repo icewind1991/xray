@@ -9,6 +9,9 @@ export default class DataProvider {
 		return $.get(OC.generateUrl(`/apps/xray/history?before=${before}`)).then(items => {
 			const requests = new Map();
 			items.forEach(item => {
+				if (!item) {
+					return;
+				}
 				if (item.type === 'request') {
 					item.data.lock = [];
 					item.data.storage = [];
@@ -18,6 +21,9 @@ export default class DataProvider {
 				}
 			});
 			items.forEach(item => {
+				if (!item) {
+					return;
+				}
 				if (item.type !== 'request') {
 					const request = requests.get(item.data.request);
 					if (request) {
