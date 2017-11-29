@@ -22,7 +22,7 @@ export default class Request extends TablePage {
 	columns = ['Time', 'Path', 'Locks', 'Storage', 'Cache', 'Queries'];
 
 	renderRow = (index, key) => {
-		if (index > this.props.items.length - 5) {
+		if (index > this.filteredRows.length - 5) {
 			this.props.loadExtra();
 		}
 		return (
