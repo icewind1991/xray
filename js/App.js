@@ -106,6 +106,18 @@ export class App extends Component {
 		});
 	};
 
+	loadSince = () => {
+		const firstRequest = this.state.requests.length > 0 ? this.state.requests[0] : '';
+		if (!firstRequest) {
+			return;
+		}
+		this.source.getSince(firstRequest.id).then(requests => {
+			if (requests.length > 0) {
+				this.setState({requests: requests.concat(this.state.requests)});
+			}
+		});
+	};
+
 	openRequest = (item) => {
 		this.setState({openRequest: item});
 	};
@@ -118,6 +130,7 @@ export class App extends Component {
 		return (
 			<AppContainer appId="xray">
 				<ControlBar>
+					<button className="refresh" onClick={this.loadSince}>Refresh</button>
 					<div className={style.filterWrapper}>
 						<input className={style.filter} type="text"
 							   placeholder="Filter path..."

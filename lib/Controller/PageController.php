@@ -51,6 +51,14 @@ class PageController extends Controller {
 	}
 
 	/**
+	 * @param string $since
+	 * @return array
+	 */
+	public function since($since = '') {
+		return $this->log->getSince($since);
+	}
+
+	/**
 	 * @NoCSRFRequired
 	 *
 	 * @return TemplateResponse

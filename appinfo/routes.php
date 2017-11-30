@@ -22,6 +22,7 @@
 return [
 	'routes' => [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'page#history', 'url' => '/history', 'verb' => 'GET']
+		['name' => 'page#history', 'url' => '/history', 'verb' => 'GET'],
+		['name' => 'page#since', 'url' => '/since', 'verb' => 'GET']
 	]
 ];

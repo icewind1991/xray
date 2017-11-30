@@ -117,6 +117,25 @@ class DatabaseLog {
 		}, $items);
 	}
 
+	public function getSince($requestId) {
+		$sinceNumericId = $this->getRequestNumericId($requestId);
+
+		$query = $this->connection->getQueryBuilder();
+
+		$query->select('l.data')
+			->from('xray_log', 'l')
+			->innerJoin('l', 'xray_requests', 'r', $query->expr()->eq('r.request_id', 'l.request_id'))
+			->where($query->expr()->gt('r.id', $query->createNamedParameter($sinceNumericId)))
+			->orderBy('l.id', 'DESC');
+
+		$result = $query->execute();
+
+		$items = $result->fetchAll(\PDO::FETCH_COLUMN);
+		return array_map(function ($item) {
+			return json_decode($item, true);
+		}, $items);
+	}
+
 	public function cleanup() {
 		$query = $this->connection->getQueryBuilder();
 
