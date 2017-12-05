@@ -2,16 +2,28 @@
 <info>
 	<id>xray</id>
 	<name>XRay</name>
-	<description>See what is happening inside the Nextcloud instance
+	<summary>Resource usage monitoring for developers</summary>
+	<description>Note: this app is **not** for production use and should not be enabled without good reason.
+
+XRay enables logging of resource usage of Nextcloud to help developers with performance optimization.
+
+Warning, sharing any information logged by this app can leak potentially private information such as user names, file structure, share metadata and more.
 	</description>
 	<licence>AGPL</licence>
 	<author>Robin Appelman</author>
 	<version>0.2.0</version>
 	<namespace>XRay</namespace>
-	<category>other</category>
+	<category>tools</category>
 	<types>
 		<logging/>
 	</types>
+
+	<website>https://github.com/icewind1991/xray</website>
+	<bugs>https://github.com/icewind1991/xray/issues</bugs>
+	<repository type="git">https://github.com/icewind1991/xray</repository>
+	<screenshot>
+		https://github.com/icewind1991/xray/raw/master/screenshots/xray.png
+	</screenshot>
 
 	<background-jobs>
 		<job>OCA\XRay\Jobs\CleanupGroups</job>
