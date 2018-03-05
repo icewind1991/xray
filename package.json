@@ -40,7 +40,6 @@
     "clipboard-polyfill": "^2.3.0",
     "event-source": "^0.1.1",
     "litesocket": "^0.9.3",
-    "moment": "^2.19.2",
     "oc-react-components": "^0.2.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
