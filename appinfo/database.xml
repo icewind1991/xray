@@ -19,9 +19,8 @@
 
 			<field>
 				<name>data</name>
-				<type>text</type>
+				<type>clob</type>
 				<notnull>true</notnull>
-				<length>20480</length>
 			</field>
 			<field>
 				<name>request_id</name>
