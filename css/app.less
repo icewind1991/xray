@@ -8,3 +8,17 @@
   display: inline-block;
   width: 100%;
 }
+
+#appContentWrapper {
+  display: flex;
+  flex-direction: column;
+
+  & > div:last-child {
+    //flex: 1 1;
+  }
+
+  & > div:first-child {
+    height: 50px;
+    flex: 0 0;
+  }
+}

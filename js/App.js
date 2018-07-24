@@ -128,17 +128,17 @@ export class App extends Component {
 
 	render () {
 		return (
-			<AppContainer appId="xray">
-				<ControlBar>
+			<div id={style.appContentWrapper}>
+				<div id="controls">
 					<button className="refresh" onClick={this.loadSince}>Refresh</button>
 					<div className={style.filterWrapper}>
 						<input className={style.filter} type="text"
 							   placeholder="Filter path..."
 							   onChange={this.onFilterChange.bind(this)}/>
 					</div>
-				</ControlBar>
+				</div>
 
-				<Content>
+				<div id={style.appContent}>
 					{this.state.openRequest ?
 						<SingleRequest request={this.state.openRequest}
 									   close={this.closeRequest}/> :
@@ -147,8 +147,8 @@ export class App extends Component {
 								 onOpenRequest={this.openRequest}
 								 items={this.state.requests}/>
 					}
-				</Content>
-			</AppContainer>
+				</div>
+			</div>
 		);
 	}
 }
