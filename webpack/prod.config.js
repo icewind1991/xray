@@ -2,8 +2,7 @@
 
 var path = require('path');
 var webpack = require('webpack');
-var CleanPlugin = require('clean-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var strip = require('strip-loader');
 
 var relativeAssetsPath = '../build';
@@ -11,6 +10,7 @@ var assetsPath = path.join(__dirname, relativeAssetsPath);
 
 module.exports = {
 	devtool: 'source-map',
+	mode: 'production',
 	context: path.resolve(__dirname, '..'),
 	entry: {
 		'main': './js/index.js'
@@ -22,7 +22,7 @@ module.exports = {
 		publicPath: '/dist/'
 	},
 	module: {
-		loaders: [
+		rules: [
 			{
 				test: /\.(jpe?g|png|gif|svg)$/,
 				loader: 'url',
@@ -36,32 +36,34 @@ module.exports = {
 			{test: /\.json$/, loader: 'json-loader'},
 			{
 				test: /\.css$/,
-				use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: [{
+				use: [
+					{
+						loader: MiniCssExtractPlugin.loader,
+						options: {
+							hmr: process.env.NODE_ENV === 'development',
+						},
+					},
+					'css-loader'
+				]
+			},
+			{
+				test: /\.less$/,
+				use: [
+					{
+						loader: MiniCssExtractPlugin.loader,
+						options: {
+							hmr: process.env.NODE_ENV === 'development',
+						},
+					},
+					{
 						loader: 'css-loader',
 						options: {
 							modules: true,
 							sourceMap: true
 						}
-					}]
-				})
-			},
-			{
-				test: /\.less$/,
-				use: ExtractTextPlugin.extract({
-					fallback: "style-loader",
-					use: [
-						{
-							loader: 'css-loader',
-							options: {
-								modules: true,
-								sourceMap: true
-							}
-						},
-						'less-loader'
-					]
-				})
+					},
+					'less-loader'
+				]
 			}
 		]
 	},
@@ -69,8 +71,7 @@ module.exports = {
 		extensions: ['.json', '.js']
 	},
 	plugins: [
-		new CleanPlugin([relativeAssetsPath]),
-		new ExtractTextPlugin("[name].css"),
+		new MiniCssExtractPlugin("[name].css"),
 		new webpack.DefinePlugin({
 			__CLIENT__: true,
 			__SERVER__: false,
@@ -80,18 +81,5 @@ module.exports = {
 
 		// ignore dev config
 		new webpack.IgnorePlugin(/\.\/dev/, /\/config$/),
-
-		// set global vars
-		new webpack.DefinePlugin({
-			'process.env': {
-				// Useful to reduce the size of client-side libraries, e.g. react
-				NODE_ENV: JSON.stringify('production')
-			}
-		}),
-		new webpack.optimize.UglifyJsPlugin({
-			compress: {
-				warnings: false
-			}
-		})
 	]
 };

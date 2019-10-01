@@ -30,6 +30,6 @@ Warning, sharing any information logged by this app can leak potentially private
 	</background-jobs>
 
 	<dependencies>
-		<nextcloud min-version="15" max-version="17"/>
+		<nextcloud min-version="15" max-version="18"/>
 	</dependencies>
 </info>
