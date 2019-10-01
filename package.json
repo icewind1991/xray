@@ -42,7 +42,7 @@
     "litesocket": "^0.9.3",
     "oc-react-components": "^0.2.0",
     "react": "^16.1.1",
-    "react-dom": "^16.1.1",
+    "react-dom": "^16.1.2",
     "react-list": "^0.8.8",
     "redis": "^2.8.0"
   }
