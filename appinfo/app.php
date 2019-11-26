@@ -24,7 +24,8 @@ namespace OCA\XRay\AppInfo;
 $appId = 'xray';
 $appName = 'XRay';
 
-$app = new Application();
+/** @var Application $app */
+$app = \OC::$server->query(Application::class);
 $app->registerSources();
 
 \OC::$server->getNavigationManager()->add(function () use ($appId, $appName) {
