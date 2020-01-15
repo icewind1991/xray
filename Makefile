@@ -20,6 +20,9 @@ build/main.js: node_modules $(jssources) $(othersources)
 node_modules: package.json
 	npm install
 
+CHANGELOG.md: node_modules
+	node_modules/.bin/changelog
+
 .PHONY: watch
 watch: node_modules
 	node node_modules/.bin/webpack-dev-server --hot --inline --port 3000 --public localcloud.icewind.me:444 --config webpack/dev.config.js
